@@ -1,0 +1,771 @@
+---
+title: "Trends in Educational Attainment"
+date: '`r format(Sys.Date(), "%B %d, %Y")`'
+output: word_document
+---
+
+\newline \newline \newline
+```{r prelim,include=FALSE,cache=FALSE}
+library(knitr)
+library(ggplot2)
+library(rmarkdown)
+
+opts_chunk$set(
+echo=FALSE,results='hide',warning = FALSE,message = FALSE,error=FALSE,cache=FALSE
+)
+
+```
+
+\newline \newline \newline
+```{r sourceCode,include=FALSE}
+ya <- TRUE
+source('trends2.r')
+```
+
+```{r loadEsts,include=FALSE}
+if(ya){
+    #load('output/estsbyYearYA.RData')
+                                        #load('output/estsbyYearAgeYA.RData')
+    load('output/estByYearYA.RData')
+} else{
+    load('output/estsbyYear.RData')
+    load('output/estsbyYearAge.RData')
+}
+
+for(i in 1:length(overTime)){
+    for(j in 1:length(overTime[[i]])){
+        overTime[[i]][[j]]$year <- i
+    }
+    for(j in 1:length(overTimeAge[[i]])){
+        overTimeAge[[i]][[j]]$year <- i
+    }
+    for(lev in c('hs','cc','bach'))
+        for(sex in 1:2){
+            overTime[[i]][[paste0(lev,'Race',c('M','F')[sex])]] <-
+                subset(overTime[[i]][[paste0(lev,'RaceSex')]],SEX==sex,select=-SEX)
+            overTimeAge[[i]][[paste0(lev,'Race',c('M','F')[sex])]] <-
+                subset(overTimeAge[[i]][[paste0(lev,'RaceSex')]],SEX==sex,select=-SEX)
+        }
+    if(!ya){
+        overTime[[i]]$hs25.29 <- overTime[[i]]$hs25.29[-grep('FALSE',rownames(overTime[[i]]$hs25.29)),]
+        overTime[[i]]$bach25.29 <- overTime[[i]]$bach25.29[-grep('FALSE',rownames(overTime[[i]]$bach25.29)),]
+        overTime[[i]]$hs25.29[['I(AGEP < 30)']] <- overTime[[i]]$bach25.29[['I(AGEP < 30)']] <- NULL
+    }
+}
+
+```
+
+
+\newline \newline \newline
+```{r analyses,include=FALSE}
+
+subs <- c('Tot',#'25.29','ByAgeCat',
+          'Sex','Race','RaceM','RaceF')#,'RaceSex')
+
+anal <- list()
+pTrend <- list()
+pDiff <- list()
+for(s in subs){
+    for(l in c('hs','cc','bach')){
+        nn <- paste0(l,s)
+        if(s%in%c('Tot','25.29')){
+            anal[[nn]] <- tabFun(nn,overTime,retEst=TRUE)
+            pTrend[[nn]] <- with(anal[[nn]],
+                                 pval(ests[c('Trend','Trend (Adj)'),1],ses[c('Trend','Trend (Adj)'),1]))
+            pDiff[[nn]] <- with(anal[[nn]],
+                                c(unadj=diffP(ests['Trend',],ses['Trend',]),
+                                  adj=diffP(ests['Trend (Adj)',],ses['Trend (Adj)',])))
+            anal[[nn]]$SS <- getSampleSizes(nn,overTime,NULL)
+        }
+        else{
+            anal[[nn]] <- list(deaf=tabFun(nn,overTime,deaf=TRUE,retEst=TRUE),
+                               hear=tabFun(nn,overTime,deaf=FALSE,retEst=TRUE))
+            pTrend[[nn]] <- with(anal[[nn]]$deaf,
+                                 cbind(unadj=pval(ests['Trend',],ses['Trend',]),
+                                       adj=pval(ests['Trend (Adj)',],ses['Trend (Adj)',])))
+            pDiff[[nn]] <- with(anal[[nn]], do.call('rbind',lapply(1:ncol(deaf[[1]]), function(cc)
+                c(unadj=diffP(c(deaf$ests['Trend',cc],hear$ests['Trend',cc]),
+                      c(deaf$ses['Trend',cc],hear$ses['Trend',cc])),
+                  adj=diffP(c(deaf$ests['Trend (Adj)',cc],hear$ests['Trend (Adj)',cc]),
+                            c(deaf$ses['Trend (Adj)',cc],hear$ses['Trend (Adj)',cc]))))))
+            anal[[nn]]$deafSS <- getSampleSizes(nn,overTime,TRUE)[colnames(anal[[nn]]$deaf$ests)]
+            anal[[nn]]$hearSS <- getSampleSizes(nn,overTime,FALSE)[colnames(anal[[nn]]$deaf$ests)]
+        }
+    }
+}
+
+alphas <- c(0.1,0.05,0.01,0.001)
+rejAdj <- lapply(alphas,function(alpha) mult3(pTrend,alpha,TRUE))
+names(rejAdj) <- alphas
+#rejUnadj <- lapply(alphas,function(alpha) mult(pTrend,pDiff,alpha,FALSE))
+
+for(nn in names(anal)){
+    anal[[nn]]$trendStars <-
+        if(names(anal[[nn]])[1]=='deaf')
+            rbind(unadj=rep('',ncol(anal[[nn]]$deaf[[1]])),#vapply(1:ncol(anal[[nn]]$deaf[[1]]),function(cc) stars(rejUnadj,'trend',nn,cc),'a'),
+                  adj=vapply(1:ncol(anal[[nn]]$deaf[[1]]),function(cc) stars(rejAdj,'trend',nn,cc),'a'))
+        else c(unadj='',#stars(rejUnadj,'trend',nn,1),
+               adj=stars(rejAdj,'trend',nn,1))
+    anal[[nn]]$diffStars <-
+        if(names(anal[[nn]])[1]=='deaf')
+            rbind(unadj=rep('',ncol(anal[[nn]]$deaf[[1]])),#vapply(1:ncol(anal[[nn]]$deaf[[1]]),function(cc) stars(rejUnadj,'diff',nn,cc),'a'),
+                  adj=rep('',ncol(anal[[nn]]$deaf[[1]])))#vapply(1:ncol(anal[[nn]]$deaf[[1]]),function(cc) stars(rejAdj,'diff',nn,cc),'a'))
+        else c(unadj='','')#stars(rejUnadj,'diff',nn,1),
+#               stars(rejAdj,'diff',nn,1))
+}
+
+
+```
+
+## Data Notes
+
+- Years 2008- 2016
+- Non-institutionalized population
+- Ages 25-34
+- Excludes Puerto Rico
+- Race/Ethnicity: If Respondent indicated Hispanic, marked as Hispanic (i.e. Black Hispanic=Hispanic)
+
+## Trend Methodology
+
+### Growth
+"Growth" is just the difference between 2016 and 2008. It only uses
+data from those two years.
+
+### Trends
+A "Trend" in this document is a linear regression coefficient,
+regressing the measure of attainment on a linear year variable.
+True trends are unlikely to be linear; however, the coefficient from
+the linear model can still be interpreted as the average linear change
+over the course of the study period (i.e. 2008-2016).
+In particular, positive coefficients indicate increasing trends, on average---this
+would not rule out plateaus or or decreasing trends over part of the
+study period---it refers only to overall averages.
+
+Age is a strong predictor of educational attainment, and changes in
+the age composition of the population may induce changes in average
+educational attainment, even absent policy relevant effects.
+The "age adjusted trends," or "Trend (Adj)" reported here accounts for
+the age composition by including age fixed effects in the linear
+models.
+Since age predicts educational attainment, in many cases this has the
+effect of reducing residual error and increasing precision, even if
+age compositions remained constant.
+
+To estimate a trend in, say, high school completion, we first
+estimated average completion overall and within each age category in each study
+year, along with standard errors.
+These estimates and standard errors used the survey weights and
+replication weights provided in the ACS.
+Then, we estimated weighted least squares models with these averages
+as data, and the reciprical of the squared standard error as weights.
+To estimate unadjusted trends, we used overall averages, and to to
+estimate adjusted trends, we used age-specific averages.
+
+### Multiplicity Adjustment and Hypothesis Tests
+Each estimate in this report is accompanied by an 95% margin of error,
+denoted with a $\pm$ symbol.
+These, combined with the estimates themselves, define 95% confidence
+intervals for the appropriate population quantity.
+For instance, we estimate that in 2016
+`r round(es <- anal$hsSex$deaf$ests['2016','Female'],1)`% of deaf females had
+attained a high school diploma, with a margin of error of
+`r round(me <- 1.96*anal$hsSex$deaf$ses['2016','Female'],2)` percentage
+points.
+Therefore, a confidence interval for the true percentage of female
+deaf Americans with a high school diploma in 2016 is
+(`r round(c(es-me,es+me),1)`).
+These intervals are not adjusted for multiplicity; therefore, we may assume that
+roughly 95% of them are "correct," in
+that they include the true population parameter.
+
+We also conducted a series of explicit hypothesis tests, testing for
+the existance (and direction) of age-adjusted linear trends over time for subgroups
+of deaf Americans.<!--, and within-subgroup differences in trends between
+deaf and hearing Americans.-->
+We tested hypothesis about *only* age-adjusted trends; though we
+estimated non-adjusted trends, we did not conduct explicit hypothesis
+tests for them.
+
+We corrected these hypothesis tests for multiplicity with the
+following <!--hierarchical--> procedure.
+First, we tested for overall trends in high school, associate degree, and bachelor degree
+completion for deaf Americans with a Holm procedure.
+If those were significant, we went on to test for trends within
+subgroups of deaf Americans; <!--corrected with the Hommel procedure
+(Hommel 1988), which assumes that all of
+the hypothesis tests are either independent or positively
+correlated---a reasonable assumption in this context.
+This overall procedure controls the familywise error rate, so the
+probability of incorrectly rejecting any null hypotheses tested in
+this document at the 0.05 level, say, is at most 5%.
+Finally, we tested for differences in treands between deaf and hearing
+Americans, overall and within subgroups where we had previously detected
+a deaf trend;--> these hypothesis tests were adjusted with the
+Bejnamini-Hochberg procedure, which controls the "false discovery
+rate" Benjamini & Hochberg (1995).
+False discovery rate control implies that we may expect, say, 5% of
+rejections at the $\alpha=0.05$ level to be incorrect; it is a more
+liberal control of multiplicity than the usual "familywise error rate."
+We conducted this procedure using three different levels: null hypotheses
+rejected at the 0.05 level are denoted with a \*, at the 0.01 level
+with \*\*, and at the 0.001 level with \*\*\*.
+
+Note that we did not test for trends among hearing Americans or
+differences between hearing and deaf Americans, and did
+not test hypotheses about attainment in any given year or about growth
+from 2008 to 2016.
+
+Since the hypothesis tests were multiplicity-adjusted and the
+confidence intervals were not, they frequently do not agree---there
+are 95% confidence intervals that do not contain zero but whose
+associated null hypotheses were not rejected at the 0.05 level.
+
+
+## Overall Attainment
+
+### High School
+
+\newline \newline \newline
+```{r HStotTable,results='markdown'}
+kable(tabFinish(anal[['hsTot']]))
+```
+
+Table: High School completion from 2008-2016.
+
+\newline \newline \newline
+```{r HStotFig,fig.cap="High School completion over time. Error bars are approximate 95% confidence intervals."}
+figFun('hsTot',overTime,erbr=TRUE)+ylab('High School Completion (%)')
+```
+\newline \newline \newline
+```{r HStotFigChange,fig.cap="Change in High School completion over time. Error bars are approximate 95% confidence intervals."}
+figFun('hsTot',overTime,chg=TRUE,erbr=TRUE)+ggtitle('High School Diploma or Equivalent')
+```
+
+### Associates
+
+\newline \newline \newline
+```{r CCtotTable,results='markdown'}
+kable(tabFinish(anal[['ccTot']]))
+```
+
+Table: Associates completion from 2008-2016.
+
+\newline \newline \newline
+```{r CCtotFig,fig.cap="Associates completion over time. Error bars are approximate 95% confidence intervals."}
+figFun('ccTot',overTime,erbr=TRUE)+ylab('Associates Completion (%)')
+```
+\newline \newline \newline
+```{r CCtotFigChange,fig.cap="Change in Associates completion over time. Error bars are approximate 95% confidence intervals."}
+figFun('ccTot',overTime,chg=TRUE,erbr=TRUE)+ggtitle('Associates Diploma or Equivalent')
+```
+
+### Bachelors
+\newline \newline \newline
+```{r BAtotTable,results='markdown'}
+kable(tabFinish(anal[['bachTot']]))
+```
+
+Table: Bachelor's degree attainment from 2008-2016.
+
+\newline \newline \newline
+```{r BAtotFig,fig.cap="High School completion over time. Error bars are approximate 95% confidence intervals."}
+figFun('bachTot',overTime,erbr=TRUE)+ylab('Bachelor\'s Degree Attainment (%)')
+```
+\newline \newline \newline
+```{r BAtotFigChange,fig.cap="Change in Bachelor\'s degree attainment over time. Error bars are approximate 95% confidence intervals."}
+figFun('bachTot',overTime,chg=TRUE,erbr=TRUE)+ggtitle('Bachelor\'s Degree or Equivalent')
+```
+
+
+
+
+
+## Attainment By Gender
+
+### High School
+
+\newline \newline \newline
+```{r HSSexDeaf,results='markdown'}
+
+kable(tabFinish(anal[['hsSex']],TRUE))
+```
+
+Table: Percentage of deaf Americans by gender attaining a
+High School diploma or equivalent.
+
+
+
+\newline \newline \newline
+```{r HSSexHear,results='markdown'}
+kable(tabFinish(anal[['hsSex']],deaf=FALSE))
+```
+
+Table: Percentage of hearing Americans by gender attaining a
+High School diploma or equivalent.
+
+\newline \newline \newline
+```{r HSbySexDeafHearDiff,results='markdown'}
+
+kable(diffDeafHear(anal[['hsSex']]))
+```
+
+Table: Differences in growth and trends between deaf and hearing
+Americans for males and females. Positive Differences indicate faster
+growth for deaf Americans.
+
+
+
+\newline \newline \newline
+```{r HSSexFig,fig.cap="High School completion by gender over time. Error bars are approximate 95% confidence intervals."}
+figFun('hsSex',overTime,erbr=FALSE)+ylab('High School Completion (%)')
+```
+\newline \newline \newline
+```{r HSSexFigChange,fig.cap="Change in High School completion by gender over time. Error bars are approximate 95% confidence intervals."}
+figFun('hsSex',overTime,chg=TRUE,erbr=FALSE)+ggtitle('High School Diploma or Equivalent')
+```
+
+### Associates
+
+\newline \newline \newline
+```{r CCSexDeaf,results='markdown'}
+
+kable(tabFinish(anal[['ccSex']],TRUE))
+```
+
+Table: Percentage of deaf Americans by gender attaining a
+Associates diploma or equivalent.
+
+
+
+\newline \newline \newline
+```{r CCSexHear,results='markdown'}
+kable(tabFinish(anal[['ccSex']],deaf=FALSE))
+```
+
+Table: Percentage of hearing Americans by gender attaining a
+Associates diploma or equivalent.
+
+\newline \newline \newline
+```{r CCbySexDeafHearDiff,results='markdown'}
+
+kable(diffDeafHear(anal[['ccSex']]))
+```
+
+Table: Differences in growth and trends between deaf and hearing
+Americans for males and females. Positive Differences indicate faster
+growth for deaf Americans.
+
+
+
+\newline \newline \newline
+```{r CCSexFig,fig.cap="Associates completion by gender over time. Error bars are approximate 95% confidence intervals."}
+figFun('ccSex',overTime,erbr=FALSE)+ylab('Associates Completion (%)')
+```
+\newline \newline \newline
+```{r CCSexFigChange,fig.cap="Change in Associates completion by gender over time. Error bars are approximate 95% confidence intervals."}
+figFun('ccSex',overTime,chg=TRUE,erbr=FALSE)+ggtitle('Associates Diploma or Equivalent')
+```
+
+### Bachelors
+\newline \newline \newline
+```{r BASexDeaf,results='markdown'}
+kable(tabFinish(anal[['bachSex']],TRUE))
+```
+
+Table: Percentage of deaf Americans by gender attaining a
+Bachelor's degree.
+
+
+
+\newline \newline \newline
+```{r BASexHear,results='markdown'}
+kable(tabFinish(anal[['bachSex']],FALSE))
+```
+
+Table: Percentage of hearing Americans by gender attaining a
+Bachelor's degree.
+
+\newline \newline \newline
+```{r BAbySexDeafHearDiff,results='markdown'}
+kable(diffDeafHear(anal[['bachSex']]))
+```
+
+Table: Differences in growth and trends between deaf and hearing
+Americans for males and females. Positive Differences indicate faster
+growth for deaf Americans.
+
+
+\newline \newline \newline
+```{r BASexFig,fig.cap="High School completion by gender over time. Error bars are approximate 95% confidence intervals."}
+figFun('bachSex',overTime,erbr=FALSE)+ylab('Bachelor\'s Degree Attainment (%)')
+```
+\newline \newline \newline
+```{r BASexFigChange,fig.cap="Change in Bachelor\'s degree by gender attainment over time. Error bars are approximate 95% confidence intervals."}
+figFun('bachSex',overTime,chg=TRUE,erbr=FALSE)+ggtitle('Bachelor\'s Degree or Equivalent')
+```
+
+
+
+
+## Attainment By Race/Ethnicity
+
+### High School
+
+\newline \newline \newline
+```{r HSRaceDeaf,results='markdown'}
+kable(tabFinish(anal[['hsRace']],TRUE))
+```
+
+Table: Percentage of deaf Americans by race/ethnicity attaining a
+High School diploma or equivalent.
+
+
+
+\newline \newline \newline
+```{r HSRaceHear,results='markdown'}
+kable(tabFinish(anal[['hsRace']],FALSE))
+```
+
+Table: Percentage of hearing Americans by race/ethnicity attaining a
+High School diploma or equivalent.
+
+\newline \newline \newline
+```{r HSbyRaceDeafHearDiff,results='markdown'}
+kable(diffDeafHear(anal[['hsRace']]))
+```
+
+Table: Differences in growth and trends between deaf and hearing
+Americans for each age category. Positive Differences indicate faster
+growth for deaf Americans.
+
+
+\newline \newline \newline
+```{r HSRaceFig,fig.cap="High School completion by race/ethnicity over time. Error bars are approximate 95% confidence intervals."}
+figFun('hsRace',overTime,erbr=FALSE)+ylab('High School Completion (%)')
+```
+\newline \newline \newline
+```{r HSRaceFigChange,fig.cap="Change in High School completion by race/ethnicity over time. Error bars are approximate 95% confidence intervals."}
+figFun('hsRace',overTime,chg=TRUE,erbr=FALSE)+ggtitle('High School Diploma or Equivalent')
+```
+
+
+### Associates
+
+\newline \newline \newline
+```{r CCRaceDeaf,results='markdown'}
+kable(tabFinish(anal[['ccRace']],TRUE))
+```
+
+Table: Percentage of deaf Americans by race/ethnicity attaining a
+Associates diploma or equivalent.
+
+
+
+\newline \newline \newline
+```{r CCRaceHear,results='markdown'}
+kable(tabFinish(anal[['ccRace']],FALSE))
+```
+
+Table: Percentage of hearing Americans by race/ethnicity attaining a
+Associates diploma or equivalent.
+
+\newline \newline \newline
+```{r CCbyRaceDeafHearDiff,results='markdown'}
+kable(diffDeafHear(anal[['ccRace']]))
+```
+
+Table: Differences in growth and trends between deaf and hearing
+Americans for each age category. Positive Differences indicate faster
+growth for deaf Americans.
+
+
+\newline \newline \newline
+```{r CCRaceFig,fig.cap="Associates completion by race/ethnicity over time. Error bars are approximate 95% confidence intervals."}
+figFun('ccRace',overTime,erbr=FALSE)+ylab('Associates Completion (%)')
+```
+\newline \newline \newline
+```{r CCRaceFigChange,fig.cap="Change in Associates completion by race/ethnicity over time. Error bars are approximate 95% confidence intervals."}
+figFun('ccRace',overTime,chg=TRUE,erbr=FALSE)+ggtitle('Associates Diploma or Equivalent')
+```
+
+### Bachelors
+\newline \newline \newline
+```{r BARaceDeaf,results='markdown'}
+kable(tabFinish(anal[['bachRace']],TRUE))
+```
+
+Table: Percentage of deaf Americans by race/ethnicity attaining a
+Bachelor's degree.
+
+
+
+\newline \newline \newline
+```{r BARaceHear,results='markdown'}
+kable(tabFinish(anal[['bachRace']],FALSE))
+```
+
+Table: Percentage of hearing Americans by race/ethnicity attaining a
+Bachelor's degree.
+
+
+\newline \newline \newline
+```{r BACHRaceHearDiff,results='markdown'}
+kable(diffDeafHear(anal[['bachRace']]))
+```
+
+Table: Differences in growth and trends between deaf and hearing
+Americans for each age category. Positive Differences indicate faster
+growth for deaf Americans.
+
+
+\newline \newline \newline
+```{r BARaceFig,fig.cap="Associates completion by race/ethnicity over time. Error bars are approximate 95% confidence intervals."}
+figFun('bachRace',overTime,erbr=FALSE)+ylab('Bachelor\'s Degree Attainment (%)')
+```
+\newline \newline \newline
+```{r BARaceFigChange,fig.cap="Change in Bachelor\'s degree attainment by race/ethnicity over time. Error bars are approximate 95% confidence intervals."}
+figFun('bachRace',overTime,chg=TRUE,erbr=FALSE)+ggtitle('Bachelor\'s Degree or Equivalent')
+```
+
+## Attainment By Race/Ethnicity And Gender
+
+### High School
+
+#### Deaf Female
+\newline \newline \newline
+```{r HSRaceSexDeafF,results='markdown'}
+kable(tabFinish(anal[['hsRaceF']],TRUE))
+```
+
+Table: Percentage of female deaf Americans by race/ethnicity attaining a
+High School diploma or equivalent.
+
+#### Deaf Male
+\newline \newline \newline
+```{r HSRaceSexDeafM,results='markdown'}
+kable(tabFinish(anal[['hsRaceM']],TRUE))
+```
+
+Table: Percentage of male deaf Americans by race/ethnicity attaining a
+High School diploma or equivalent.
+
+
+#### Hearing Female
+\newline \newline \newline
+```{r HSRaceSexHearF,results='markdown'}
+kable(tabFinish(anal[['hsRaceF']],FALSE))
+```
+
+Table: Percentage of female hearing Americans by race/ethnicity attaining a
+High School diploma or equivalent.
+
+#### Hearing Male
+\newline \newline \newline
+```{r HSRaceSexHearM,results='markdown'}
+kable(tabFinish(anal[['hsRaceM']],FALSE))
+```
+
+Table: Percentage of male hearing Americans by race/ethnicity attaining a
+High School diploma or equivalent.
+
+#### Deaf Hearing Differences by Race: Female
+\newline \newline \newline
+```{r results='markdown'}
+kable(diffDeafHear(anal[['hsRaceF']]))
+```
+
+Table: Differences in growth and trends between female deaf and hearing
+Americans for each race/ethicity category. Positive Differences indicate faster
+growth for deaf Americans.
+
+#### Deaf Hearing Differences by Race: Male
+\newline \newline \newline
+```{r results='markdown'}
+kable(diffDeafHear(anal[['hsRaceM']]))
+```
+
+Table: Differences in growth and trends between male deaf and hearing
+Americans for each race/ethicity category. Positive Differences indicate faster
+growth for deaf Americans.
+
+
+
+\newline \newline \newline
+```{r HSRaceFemFig,fig.cap="Female High School completion by race/ethnicity over time. Error bars are approximate 95% confidence intervals."}
+figFun('hsRaceF',overTime,erbr=FALSE)+ylab('High School Completion (%)')+ggtitle("Females")
+```
+```{r HSRaceMalFig,fig.cap="Male High School completion by race/ethnicity over time. Error bars are approximate 95% confidence intervals."}
+figFun('hsRaceM',overTime,erbr=FALSE)+ylab('High School Completion (%)')+ggtitle("Males")
+```
+
+
+\newline \newline \newline
+```{r HSRaceFemFigChg,fig.cap="Female High School completion by race/ethnicity over time. Error bars are approximate 95% confidence intervals."}
+figFun('hsRaceF',overTime,chg=TRUE,erbr=FALSE)+ylab('High School Completion (%)')+ggtitle("Females")
+```
+```{r HSRaceMalFigChg,fig.cap="Male High School completion by race/ethnicity over time. Error bars are approximate 95% confidence intervals."}
+figFun('hsRaceM',overTime,chg=TRUE,erbr=FALSE)+ylab('High School Completion (%)')+ggtitle("Males")
+```
+
+
+### Associates
+
+#### Deaf Female
+\newline \newline \newline
+```{r CCRaceSexDeafF,results='markdown'}
+kable(tabFinish(anal[['ccRaceF']],TRUE))
+```
+
+Table: Percentage of female deaf Americans by race/ethnicity attaining a
+Associates diploma or equivalent.
+
+#### Deaf Male
+\newline \newline \newline
+```{r CCRaceSexDeafM,results='markdown'}
+kable(tabFinish(anal[['ccRaceM']],TRUE))
+```
+
+Table: Percentage of male deaf Americans by race/ethnicity attaining a
+Associates diploma or equivalent.
+
+
+#### Hearing Female
+\newline \newline \newline
+```{r CCRaceSexHearF,results='markdown'}
+kable(tabFinish(anal[['ccRaceF']],FALSE))
+```
+
+Table: Percentage of female hearing Americans by race/ethnicity attaining a
+Associates diploma or equivalent.
+
+#### Hearing Male
+\newline \newline \newline
+```{r CCRaceSexHearM,results='markdown'}
+kable(tabFinish(anal[['ccRaceM']],FALSE))
+```
+
+Table: Percentage of male hearing Americans by race/ethnicity attaining a
+Associates diploma or equivalent.
+
+#### Deaf Hearing Differences by Race: Female
+\newline \newline \newline
+```{r results='markdown'}
+kable(diffDeafHear(anal[['ccRaceF']]))
+```
+
+Table: Differences in growth and trends between female deaf and hearing
+Americans for each race/ethicity category. Positive Differences indicate faster
+growth for deaf Americans.
+
+#### Deaf Hearing Differences by Race: Male
+\newline \newline \newline
+```{r results='markdown'}
+kable(diffDeafHear(anal[['ccRaceM']]))
+```
+
+Table: Differences in growth and trends between male deaf and hearing
+Americans for each race/ethicity category. Positive Differences indicate faster
+growth for deaf Americans.
+
+
+
+\newline \newline \newline
+```{r CCRaceFemFig,fig.cap="Female Associates completion by race/ethnicity over time. Error bars are approximate 95% confidence intervals."}
+figFun('ccRaceF',overTime,erbr=FALSE)+ylab('Associates Completion (%)')+ggtitle("Females")
+```
+```{r CCRaceMalFig,fig.cap="Male Associates completion by race/ethnicity over time. Error bars are approximate 95% confidence intervals."}
+figFun('ccRaceM',overTime,erbr=FALSE)+ylab('Associates Completion (%)')+ggtitle("Males")
+```
+
+
+\newline \newline \newline
+```{r CCRaceFemFigChg,fig.cap="Female Associates completion by race/ethnicity over time. Error bars are approximate 95% confidence intervals."}
+figFun('ccRaceF',overTime,chg=TRUE,erbr=FALSE)+ylab('Associates Completion (%)')+ggtitle("Females")
+```
+```{r CCRaceMalFigChg,fig.cap="Male Associates completion by race/ethnicity over time. Error bars are approximate 95% confidence intervals."}
+figFun('ccRaceM',overTime,chg=TRUE,erbr=FALSE)+ylab('Associates Completion (%)')+ggtitle("Males")
+```
+
+
+
+
+
+### Bachelors
+
+#### Deaf Female
+\newline \newline \newline
+```{r BACHRaceSexDeafF,results='markdown'}
+kable(tabFinish(anal[['bachRaceF']],TRUE))
+```
+
+Table: Percentage of female deaf Americans by race/ethnicity attaining a
+Bachelors Degree.
+Bachelors degree or equivalent.
+
+#### Deaf Male
+\newline \newline \newline
+```{r BACHRaceSexDeafM,results='markdown'}
+kable(tabFinish(anal[['bachRaceM']],TRUE))
+```
+
+Table: Percentage of male deaf Americans by race/ethnicity attaining a
+Bachelors degree or equivalent.
+
+
+#### Hearing Female
+\newline \newline \newline
+```{r BACHRaceSexHearF,results='markdown'}
+kable(tabFinish(anal[['bachRaceF']],FALSE))
+```
+
+Table: Percentage of female hearing Americans by race/ethnicity attaining a
+Bachelors degree or equivalent.
+
+#### Hearing Male
+\newline \newline \newline
+```{r BACHRaceSexHearM,results='markdown'}
+kable(tabFinish(anal[['bachRaceM']],FALSE))
+```
+
+Table: Percentage of male hearing Americans by race/ethnicity attaining a
+Bachelors degree or equivalent.
+
+#### Deaf Hearing Differences by Race: Female
+\newline \newline \newline
+```{r results='markdown'}
+kable(diffDeafHear(anal[['bachRaceF']]))
+```
+
+Table: Differences in growth and trends between female deaf and hearing
+Americans for each race/ethicity category. Positive Differences indicate faster
+growth for deaf Americans.
+
+#### Deaf Hearing Differences by Race: Male
+\newline \newline \newline
+```{r results='markdown'}
+kable(diffDeafHear(anal[['bachRaceM']]))
+```
+
+Table: Differences in growth and trends between male deaf and hearing
+Americans for each race/ethicity category. Positive Differences indicate faster
+growth for deaf Americans.
+
+
+
+\newline \newline \newline
+```{r BACHRaceFemFig,fig.cap="Female High School completion by race/ethnicity over time. Error bars are approximate 95% confidence intervals."}
+figFun('bachRaceF',overTime,erbr=FALSE)+ylab('College Completion (%)')+ggtitle("Females")
+```
+```{r BACHRaceMalFig,fig.cap="Male High School completion by race/ethnicity over time. Error bars are approximate 95% confidence intervals."}
+figFun('bachRaceM',overTime,erbr=FALSE)+ylab('College Completion (%)')+ggtitle("Males")
+```
+
+
+\newline \newline \newline
+```{r BACHRaceFemFigChg,fig.cap="Female High School completion by race/ethnicity over time. Error bars are approximate 95% confidence intervals."}
+figFun('bachRaceF',overTime,chg=TRUE,erbr=FALSE)+ylab('College Completion (%)')+ggtitle("Females")
+```
+```{r BACHRaceMalFigChg,fig.cap="Male High School completion by race/ethnicity over time. Error bars are approximate 95% confidence intervals."}
+figFun('bachRaceM',overTime,chg=TRUE,erbr=FALSE)+ylab('College Completion (%)')+ggtitle("Males")
+```
+
