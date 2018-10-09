@@ -1,5 +1,5 @@
 library(survey)
-setwd('../data/acs/historical')
+setwd('../../data/byYear')
 
 makeDes <- function(year){
 
@@ -71,4 +71,4 @@ for(year in c('08','09','10','11','12','13','14','15','16')){
 
 
 
-setwd('~/Google Drive/stephanie cawthon/overTime')
+setwd('deafCenter/changeOverTime25.34')
