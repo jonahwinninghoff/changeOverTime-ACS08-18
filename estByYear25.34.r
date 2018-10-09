@@ -43,7 +43,7 @@ sampSize <- function(des){
 
 yearInfo <- function(year){
     print(year)
-    load(paste0('../data/acs/historical/design',year,'.RData'))
+    load(paste0('../../data/byYear/design',year,'.RData'))
     des <- subset(des,AGEP>24 & AGEP<35)
     des <- update(des,raceEth=ifelse(raceEth%in%c('American Indian','Asian/PacIsl'),'Other',raceEth))
 
