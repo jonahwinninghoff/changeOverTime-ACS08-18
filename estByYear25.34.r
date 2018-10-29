@@ -83,7 +83,7 @@ overTime <- sapply(overTimeTot,function(x) x$outRaw,simplify=FALSE,USE.NAMES=TRU
 overTimeAge <- sapply(overTimeTot,function(x) x$outAdj,simplify=FALSE,USE.NAMES=TRUE)
 sampleSizes <- sapply(overTimeTot,function(x) x$outSS,simplify=FALSE,USE.NAMES=TRUE)
 
-save(overTime,overTimeAge,sampleSizes,file='estByYear2529.RData')
+save(overTime,overTimeAge,sampleSizes,file='output/estByYear2529.RData')
 
 ## nyear <- length(years)
 ## nAnal <- length(overTime[[1]])
