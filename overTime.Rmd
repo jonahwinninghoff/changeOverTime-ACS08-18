@@ -19,7 +19,7 @@ echo=FALSE,results='hide',warning = FALSE,message = FALSE,error=FALSE,cache=FALS
 \newline \newline \newline
 ```{r sourceCode,include=FALSE}
 ya <- FALSE
-source('trends2.r')
+source('trends.r')
 ```
 
 ```{r loadEsts,include=FALSE}
@@ -52,7 +52,8 @@ for(i in 1:length(overTime)){
 \newline \newline \newline
 ```{r analyses,include=FALSE}
 
-subs <- c('Tot',#'25.29','ByAgeCat',
+subs <- c('Tot',#'25.29',
+          'ByAgeCat',
           'Sex','Race','RaceM','RaceF')#,'RaceSex')
 
 anal <- list()
@@ -95,16 +96,15 @@ names(rejAdj) <- alphas
 for(nn in names(anal)){
     anal[[nn]]$trendStars <-
         if(names(anal[[nn]])[1]=='deaf')
-            rbind(unadj=rep('',ncol(anal[[nn]]$deaf[[1]])),#vapply(1:ncol(anal[[nn]]$deaf[[1]]),function(cc) stars(rejUnadj,'trend',nn,cc),'a'),
+            rbind(unadj=rep('',ncol(anal[[nn]]$deaf[[1]])),
                   adj=vapply(1:ncol(anal[[nn]]$deaf[[1]]),function(cc) stars(rejAdj,'trend',nn,cc),'a'))
-        else c(unadj='',#stars(rejUnadj,'trend',nn,1),
+        else c(unadj='',
                adj=stars(rejAdj,'trend',nn,1))
     anal[[nn]]$diffStars <-
         if(names(anal[[nn]])[1]=='deaf')
-            rbind(unadj=rep('',ncol(anal[[nn]]$deaf[[1]])),#vapply(1:ncol(anal[[nn]]$deaf[[1]]),function(cc) stars(rejUnadj,'diff',nn,cc),'a'),
-                  adj=rep('',ncol(anal[[nn]]$deaf[[1]])))#vapply(1:ncol(anal[[nn]]$deaf[[1]]),function(cc) stars(rejAdj,'diff',nn,cc),'a'))
-        else c(unadj='','')#stars(rejUnadj,'diff',nn,1),
-#               stars(rejAdj,'diff',nn,1))
+            rbind(unadj=rep('',ncol(anal[[nn]]$deaf[[1]])),
+                  adj=vapply(1:ncol(anal[[nn]]$deaf[[1]]),function(cc) stars(rejAdj,'diff',nn,cc),'a'))
+        else c(unadj='',adj=stars(rejAdj,'diff',nn,1))
 }
 
 
@@ -184,7 +184,8 @@ following <!--hierarchical--> procedure.
 First, we tested for overall trends in high school, associate degree, and bachelor degree
 completion for deaf Americans with a Holm procedure.
 If those were significant, we went on to test for trends within
-subgroups of deaf Americans; <!--corrected with the Hommel procedure
+subgroups of deaf Americans and for differences in trends between deaf
+and hearing americans and within subgroups; <!--corrected with the Hommel procedure
 (Hommel 1988), which assumes that all of
 the hypothesis tests are either independent or positively
 correlated---a reasonable assumption in this context.
@@ -397,6 +398,125 @@ figFun('bachSex',overTime,erbr=FALSE)+ylab('Bachelor\'s Degree Attainment (%)')
 figFun('bachSex',overTime,chg=TRUE,erbr=FALSE)+ggtitle('Bachelor\'s Degree or Equivalent')
 ```
 
+## Attainment By Age Category
+
+### High School
+
+\newline \newline \newline
+```{r HSByAgeCatDeaf,results='markdown'}
+kable(tabFinish(anal[['hsByAgeCat']],TRUE))
+```
+
+Table: Percentage of deaf Americans by age category attaining a
+High School diploma or equivalent.
+
+
+
+\newline \newline \newline
+```{r HSByAgeCatHear,results='markdown'}
+kable(tabFinish(anal[['hsByAgeCat']],FALSE))
+```
+
+Table: Percentage of hearing Americans by age category attaining a
+High School diploma or equivalent.
+
+\newline \newline \newline
+```{r HSbyByAgeCatDeafHearDiff,results='markdown'}
+kable(diffDeafHear(anal[['hsByAgeCat']]))
+```
+
+Table: Differences in growth and trends between deaf and hearing
+Americans for each age category. Positive Differences indicate faster
+growth for deaf Americans.
+
+
+\newline \newline \newline
+```{r HSByAgeCatFig,fig.cap="High School completion by age category over time. Error bars are approximate 95% confidence intervals."}
+figFun('hsByAgeCat',overTime,erbr=FALSE)+ylab('High School Completion (%)')
+```
+\newline \newline \newline
+```{r HSByAgeCatFigChange,fig.cap="Change in High School completion by age category over time. Error bars are approximate 95% confidence intervals."}
+figFun('hsByAgeCat',overTime,chg=TRUE,erbr=FALSE)+ggtitle('High School Diploma or Equivalent')
+```
+
+
+### Associates
+
+\newline \newline \newline
+```{r CCByAgeCatDeaf,results='markdown'}
+kable(tabFinish(anal[['ccByAgeCat']],TRUE))
+```
+
+Table: Percentage of deaf Americans by age category attaining a
+Associates diploma or equivalent.
+
+
+
+\newline \newline \newline
+```{r CCByAgeCatHear,results='markdown'}
+kable(tabFinish(anal[['ccByAgeCat']],FALSE))
+```
+
+Table: Percentage of hearing Americans by age category attaining a
+Associates diploma or equivalent.
+
+\newline \newline \newline
+```{r CCbyByAgeCatDeafHearDiff,results='markdown'}
+kable(diffDeafHear(anal[['ccByAgeCat']]))
+```
+
+Table: Differences in growth and trends between deaf and hearing
+Americans for each age category. Positive Differences indicate faster
+growth for deaf Americans.
+
+
+\newline \newline \newline
+```{r CCByAgeCatFig,fig.cap="Associates completion by age category over time. Error bars are approximate 95% confidence intervals."}
+figFun('ccByAgeCat',overTime,erbr=FALSE)+ylab('Associates Completion (%)')
+```
+\newline \newline \newline
+```{r CCByAgeCatFigChange,fig.cap="Change in Associates completion by age category over time. Error bars are approximate 95% confidence intervals."}
+figFun('ccByAgeCat',overTime,chg=TRUE,erbr=FALSE)+ggtitle('Associates Diploma or Equivalent')
+```
+
+### Bachelors
+\newline \newline \newline
+```{r BAByAgeCatDeaf,results='markdown'}
+kable(tabFinish(anal[['bachByAgeCat']],TRUE))
+```
+
+Table: Percentage of deaf Americans by age category attaining a
+Bachelor's degree.
+
+
+
+\newline \newline \newline
+```{r BAByAgeCatHear,results='markdown'}
+kable(tabFinish(anal[['bachByAgeCat']],FALSE))
+```
+
+Table: Percentage of hearing Americans by age category attaining a
+Bachelor's degree.
+
+
+\newline \newline \newline
+```{r BACHByAgeCatHearDiff,results='markdown'}
+kable(diffDeafHear(anal[['bachByAgeCat']]))
+```
+
+Table: Differences in growth and trends between deaf and hearing
+Americans for each age category. Positive Differences indicate faster
+growth for deaf Americans.
+
+
+\newline \newline \newline
+```{r BAByAgeCatFig,fig.cap="Associates completion by age category over time. Error bars are approximate 95% confidence intervals."}
+figFun('bachByAgeCat',overTime,erbr=FALSE)+ylab('Bachelor\'s Degree Attainment (%)')
+```
+\newline \newline \newline
+```{r BAByAgeCatFigChange,fig.cap="Change in Bachelor\'s degree attainment by age category over time. Error bars are approximate 95% confidence intervals."}
+figFun('bachByAgeCat',overTime,chg=TRUE,erbr=FALSE)+ggtitle('Bachelor\'s Degree or Equivalent')
+```
 
 
 
@@ -428,7 +548,7 @@ kable(diffDeafHear(anal[['hsRace']]))
 ```
 
 Table: Differences in growth and trends between deaf and hearing
-Americans for each age category. Positive Differences indicate faster
+Americans for each race/ethnicity. Positive Differences indicate faster
 growth for deaf Americans.
 
 
@@ -468,7 +588,7 @@ kable(diffDeafHear(anal[['ccRace']]))
 ```
 
 Table: Differences in growth and trends between deaf and hearing
-Americans for each age category. Positive Differences indicate faster
+Americans for each race/ethnicity. Positive Differences indicate faster
 growth for deaf Americans.
 
 
@@ -507,7 +627,7 @@ kable(diffDeafHear(anal[['bachRace']]))
 ```
 
 Table: Differences in growth and trends between deaf and hearing
-Americans for each age category. Positive Differences indicate faster
+Americans for each race/ethnicity. Positive Differences indicate faster
 growth for deaf Americans.
 
 
