@@ -44,7 +44,7 @@ sampSize <- function(des){
 yearInfo <- function(year){
     print(year)
     load(paste0('../../data/byYear/design',year,'.RData'))
-    des <- subset(des,AGEP>24 & AGEP<35)
+    des <- subset(des,AGEP>24 & AGEP<65) ## changed this to change age range
     des <- update(des,raceEth=ifelse(raceEth%in%c('American Indian','Asian/PacIsl'),'Other',raceEth))
 
     levs <- c('HS','Associates','Bachelors')
@@ -64,10 +64,10 @@ cl <- makeCluster(4)
 clusterEvalQ(cl,library(survey))
 clusterExport(cl,c('abvs','est1','sampSize'))
 
-years <- c('08','09','10','11','12','13','14','15','16')
+years <- c('08','09','10','11','12','13','14','15','16','17')
 overTimeTot <- parLapply(cl,years,yearInfo)
 names(overTimeTot) <- years
-save(overTimeTot,file='output/estsOverTimeTot25.34.RData')
+save(overTimeTot,file='output/estsOverTimeTot.RData')
 
 
 
