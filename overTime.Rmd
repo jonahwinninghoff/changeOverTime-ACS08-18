@@ -228,8 +228,9 @@ Table: High School completion from 2008-2016.
 
 \newline \newline \newline
 ```{r HStotFig,fig.cap="High School completion over time. Error bars are approximate 95% confidence intervals."}
-figFun('hsTot',overTime,erbr=TRUE)+ylab('High School Completion (%)')
+figFun('hsTot',overTime,erbr=TRUE)+ylab('High School Completion')
 ```
+<br><br><br><br>
 \newline \newline \newline
 ```{r HStotFigChange,fig.cap="Change in High School completion over time. Error bars are approximate 95% confidence intervals."}
 figFun('hsTot',overTime,chg=TRUE,erbr=TRUE)+ggtitle('High School Diploma or Equivalent')
@@ -246,7 +247,7 @@ Table: Associates completion from 2008-2016.
 
 \newline \newline \newline
 ```{r CCtotFig,fig.cap="Associates completion over time. Error bars are approximate 95% confidence intervals."}
-figFun('ccTot',overTime,erbr=TRUE)+ylab('Associates Completion (%)')
+figFun('ccTot',overTime,erbr=TRUE)+ylab('Associates Completion')
 ```
 \newline \newline \newline
 ```{r CCtotFigChange,fig.cap="Change in Associates completion over time. Error bars are approximate 95% confidence intervals."}
@@ -263,7 +264,7 @@ Table: Bachelor's degree attainment from 2008-2016.
 
 \newline \newline \newline
 ```{r BAtotFig,fig.cap="High School completion over time. Error bars are approximate 95% confidence intervals."}
-figFun('bachTot',overTime,erbr=TRUE)+ylab('Bachelor\'s Degree Attainment (%)')
+figFun('bachTot',overTime,erbr=TRUE)+ylab('Bachelor\'s Degree Attainment')
 ```
 \newline \newline \newline
 ```{r BAtotFigChange,fig.cap="Change in Bachelor\'s degree attainment over time. Error bars are approximate 95% confidence intervals."}
@@ -311,7 +312,7 @@ growth for deaf Americans.
 
 \newline \newline \newline
 ```{r HSSexFig,fig.cap="High School completion by gender over time. Error bars are approximate 95% confidence intervals."}
-figFun('hsSex',overTime,erbr=FALSE)+ylab('High School Completion (%)')
+figFun('hsSex',overTime,erbr=FALSE)+ylab('High School Completion')
 ```
 \newline \newline \newline
 ```{r HSSexFigChange,fig.cap="Change in High School completion by gender over time. Error bars are approximate 95% confidence intervals."}
@@ -353,7 +354,7 @@ growth for deaf Americans.
 
 \newline \newline \newline
 ```{r CCSexFig,fig.cap="Associates completion by gender over time. Error bars are approximate 95% confidence intervals."}
-figFun('ccSex',overTime,erbr=FALSE)+ylab('Associates Completion (%)')
+figFun('ccSex',overTime,erbr=FALSE)+ylab('Associates Completion')
 ```
 \newline \newline \newline
 ```{r CCSexFigChange,fig.cap="Change in Associates completion by gender over time. Error bars are approximate 95% confidence intervals."}
@@ -391,7 +392,7 @@ growth for deaf Americans.
 
 \newline \newline \newline
 ```{r BASexFig,fig.cap="High School completion by gender over time. Error bars are approximate 95% confidence intervals."}
-figFun('bachSex',overTime,erbr=FALSE)+ylab('Bachelor\'s Degree Attainment (%)')
+figFun('bachSex',overTime,erbr=FALSE)+ylab('Bachelor\'s Degree Attainment')
 ```
 \newline \newline \newline
 ```{r BASexFigChange,fig.cap="Change in Bachelor\'s degree by gender attainment over time. Error bars are approximate 95% confidence intervals."}
@@ -432,7 +433,7 @@ growth for deaf Americans.
 
 \newline \newline \newline
 ```{r HSByAgeCatFig,fig.cap="High School completion by age category over time. Error bars are approximate 95% confidence intervals."}
-figFun('hsByAgeCat',overTime,erbr=FALSE)+ylab('High School Completion (%)')
+figFun('hsByAgeCat',overTime,erbr=FALSE)+ylab('High School Completion')
 ```
 \newline \newline \newline
 ```{r HSByAgeCatFigChange,fig.cap="Change in High School completion by age category over time. Error bars are approximate 95% confidence intervals."}
@@ -472,7 +473,7 @@ growth for deaf Americans.
 
 \newline \newline \newline
 ```{r CCByAgeCatFig,fig.cap="Associates completion by age category over time. Error bars are approximate 95% confidence intervals."}
-figFun('ccByAgeCat',overTime,erbr=FALSE)+ylab('Associates Completion (%)')
+figFun('ccByAgeCat',overTime,erbr=FALSE)+ylab('Associates Completion')
 ```
 \newline \newline \newline
 ```{r CCByAgeCatFigChange,fig.cap="Change in Associates completion by age category over time. Error bars are approximate 95% confidence intervals."}
@@ -511,7 +512,7 @@ growth for deaf Americans.
 
 \newline \newline \newline
 ```{r BAByAgeCatFig,fig.cap="Associates completion by age category over time. Error bars are approximate 95% confidence intervals."}
-figFun('bachByAgeCat',overTime,erbr=FALSE)+ylab('Bachelor\'s Degree Attainment (%)')
+figFun('bachByAgeCat',overTime,erbr=FALSE)+ylab('Bachelor\'s Degree Attainment')
 ```
 \newline \newline \newline
 ```{r BAByAgeCatFigChange,fig.cap="Change in Bachelor\'s degree attainment by age category over time. Error bars are approximate 95% confidence intervals."}
@@ -554,7 +555,7 @@ growth for deaf Americans.
 
 \newline \newline \newline
 ```{r HSRaceFig,fig.cap="High School completion by race/ethnicity over time. Error bars are approximate 95% confidence intervals."}
-figFun('hsRace',overTime,erbr=FALSE)+ylab('High School Completion (%)')
+figFun('hsRace',overTime,erbr=FALSE)+ylab('High School Completion')
 ```
 \newline \newline \newline
 ```{r HSRaceFigChange,fig.cap="Change in High School completion by race/ethnicity over time. Error bars are approximate 95% confidence intervals."}
@@ -594,7 +595,7 @@ growth for deaf Americans.
 
 \newline \newline \newline
 ```{r CCRaceFig,fig.cap="Associates completion by race/ethnicity over time. Error bars are approximate 95% confidence intervals."}
-figFun('ccRace',overTime,erbr=FALSE)+ylab('Associates Completion (%)')
+figFun('ccRace',overTime,erbr=FALSE)+ylab('Associates Completion')
 ```
 \newline \newline \newline
 ```{r CCRaceFigChange,fig.cap="Change in Associates completion by race/ethnicity over time. Error bars are approximate 95% confidence intervals."}
@@ -633,7 +634,7 @@ growth for deaf Americans.
 
 \newline \newline \newline
 ```{r BARaceFig,fig.cap="Associates completion by race/ethnicity over time. Error bars are approximate 95% confidence intervals."}
-figFun('bachRace',overTime,erbr=FALSE)+ylab('Bachelor\'s Degree Attainment (%)')
+figFun('bachRace',overTime,erbr=FALSE)+ylab('Bachelor\'s Degree Attainment')
 ```
 \newline \newline \newline
 ```{r BARaceFigChange,fig.cap="Change in Bachelor\'s degree attainment by race/ethnicity over time. Error bars are approximate 95% confidence intervals."}
@@ -705,19 +706,19 @@ growth for deaf Americans.
 
 \newline \newline \newline
 ```{r HSRaceFemFig,fig.cap="Female High School completion by race/ethnicity over time. Error bars are approximate 95% confidence intervals."}
-figFun('hsRaceF',overTime,erbr=FALSE)+ylab('High School Completion (%)')+ggtitle("Females")
+figFun('hsRaceF',overTime,erbr=FALSE)+ylab('High School Completion')+ggtitle("Females")
 ```
 ```{r HSRaceMalFig,fig.cap="Male High School completion by race/ethnicity over time. Error bars are approximate 95% confidence intervals."}
-figFun('hsRaceM',overTime,erbr=FALSE)+ylab('High School Completion (%)')+ggtitle("Males")
+figFun('hsRaceM',overTime,erbr=FALSE)+ylab('High School Completion')+ggtitle("Males")
 ```
 
 
 \newline \newline \newline
 ```{r HSRaceFemFigChg,fig.cap="Female High School completion by race/ethnicity over time. Error bars are approximate 95% confidence intervals."}
-figFun('hsRaceF',overTime,chg=TRUE,erbr=FALSE)+ylab('High School Completion (%)')+ggtitle("Females")
+figFun('hsRaceF',overTime,chg=TRUE,erbr=FALSE)+ylab('High School Completion')+ggtitle("Females")
 ```
 ```{r HSRaceMalFigChg,fig.cap="Male High School completion by race/ethnicity over time. Error bars are approximate 95% confidence intervals."}
-figFun('hsRaceM',overTime,chg=TRUE,erbr=FALSE)+ylab('High School Completion (%)')+ggtitle("Males")
+figFun('hsRaceM',overTime,chg=TRUE,erbr=FALSE)+ylab('High School Completion')+ggtitle("Males")
 ```
 
 
@@ -784,19 +785,19 @@ growth for deaf Americans.
 
 \newline \newline \newline
 ```{r CCRaceFemFig,fig.cap="Female Associates completion by race/ethnicity over time. Error bars are approximate 95% confidence intervals."}
-figFun('ccRaceF',overTime,erbr=FALSE)+ylab('Associates Completion (%)')+ggtitle("Females")
+figFun('ccRaceF',overTime,erbr=FALSE)+ylab('Associates Completion')+ggtitle("Females")
 ```
 ```{r CCRaceMalFig,fig.cap="Male Associates completion by race/ethnicity over time. Error bars are approximate 95% confidence intervals."}
-figFun('ccRaceM',overTime,erbr=FALSE)+ylab('Associates Completion (%)')+ggtitle("Males")
+figFun('ccRaceM',overTime,erbr=FALSE)+ylab('Associates Completion')+ggtitle("Males")
 ```
 
 
 \newline \newline \newline
 ```{r CCRaceFemFigChg,fig.cap="Female Associates completion by race/ethnicity over time. Error bars are approximate 95% confidence intervals."}
-figFun('ccRaceF',overTime,chg=TRUE,erbr=FALSE)+ylab('Associates Completion (%)')+ggtitle("Females")
+figFun('ccRaceF',overTime,chg=TRUE,erbr=FALSE)+ylab('Associates Completion')+ggtitle("Females")
 ```
 ```{r CCRaceMalFigChg,fig.cap="Male Associates completion by race/ethnicity over time. Error bars are approximate 95% confidence intervals."}
-figFun('ccRaceM',overTime,chg=TRUE,erbr=FALSE)+ylab('Associates Completion (%)')+ggtitle("Males")
+figFun('ccRaceM',overTime,chg=TRUE,erbr=FALSE)+ylab('Associates Completion')+ggtitle("Males")
 ```
 
 
@@ -867,18 +868,18 @@ growth for deaf Americans.
 
 \newline \newline \newline
 ```{r BACHRaceFemFig,fig.cap="Female High School completion by race/ethnicity over time. Error bars are approximate 95% confidence intervals."}
-figFun('bachRaceF',overTime,erbr=FALSE)+ylab('College Completion (%)')+ggtitle("Females")
+figFun('bachRaceF',overTime,erbr=FALSE)+ylab('College Completion')+ggtitle("Females")
 ```
 ```{r BACHRaceMalFig,fig.cap="Male High School completion by race/ethnicity over time. Error bars are approximate 95% confidence intervals."}
-figFun('bachRaceM',overTime,erbr=FALSE)+ylab('College Completion (%)')+ggtitle("Males")
+figFun('bachRaceM',overTime,erbr=FALSE)+ylab('College Completion')+ggtitle("Males")
 ```
 
 
 \newline \newline \newline
 ```{r BACHRaceFemFigChg,fig.cap="Female High School completion by race/ethnicity over time. Error bars are approximate 95% confidence intervals."}
-figFun('bachRaceF',overTime,chg=TRUE,erbr=FALSE)+ylab('College Completion (%)')+ggtitle("Females")
+figFun('bachRaceF',overTime,chg=TRUE,erbr=FALSE)+ylab('College Completion')+ggtitle("Females")
 ```
 ```{r BACHRaceMalFigChg,fig.cap="Male High School completion by race/ethnicity over time. Error bars are approximate 95% confidence intervals."}
-figFun('bachRaceM',overTime,chg=TRUE,erbr=FALSE)+ylab('College Completion (%)')+ggtitle("Males")
+figFun('bachRaceM',overTime,chg=TRUE,erbr=FALSE)+ylab('College Completion')+ggtitle("Males")
 ```
 
