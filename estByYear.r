@@ -45,7 +45,7 @@ yearInfo <- function(year){
     print(year)
     load(paste0('../../data/byYear/design',year,'.RData'))
     des <- subset(des,AGEP>24 & AGEP<65) ## changed this to change age range
-    des <- update(des,raceEth=ifelse(raceEth%in%c('American Indian','Asian/PacIsl'),'Other',raceEth))
+#    des <- update(des,raceEth=ifelse(raceEth%in%c('American Indian','Asian/PacIsl'),'Other',raceEth))
 
     levs <- c('HS','Associates','Bachelors')
 
