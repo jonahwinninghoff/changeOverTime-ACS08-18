@@ -57,8 +57,8 @@ tabFunBegin <- function(nnn,ot,deaf=NULL){
             trndsAdj[grep(paste0('DEAR=',ifelse(deaf,1,2)),names(trndsAdj))]
     }
 
-    ests <- extrSubs(ccc,'y')*100
-    ses <- extrSubs(ccc,'se')*100
+    ests <- extrSubs(ccc,'y')*1
+    ses <- extrSubs(ccc,'se')*1
 
     ests <- rbind(ests,
                   Growth=ests[nrow(ests),]-ests[1,])
@@ -80,10 +80,10 @@ estsRS <- function(tabb){
         race <- substr(nm,nchar(sex)+2,nchar(nm))
         trd <- tabb$trnd[[grep(paste0('SEX=',sex,' raceEth=',race,' DEAR='),names(tabb$trnd))]]
         trdA <- tabb$trndsAdj[[grep(paste0('SEX=',sex,' raceEth=',race,' DEAR='),names(tabb$trndsAdj))]]
-        tab['Trend',j] <- trd[1]*100
-        tab['Trend (Adj)',j] <- trdA[1]*100
-        ses['Trend',j] <- trd[2]*100
-        ses['Trend (Adj)',j] <- trdA[2]*100
+        tab['Trend',j] <- trd[1]*1
+        tab['Trend (Adj)',j] <- trdA[1]*1
+        ses['Trend',j] <- trd[2]*1
+        ses['Trend (Adj)',j] <- trdA[2]*1
     }
     list(ests=tab,ses=ses)
 }
@@ -100,14 +100,14 @@ tabFun <- function(nnn,ot,deaf=NULL,moe=TRUE,retEst=TRUE){
 
         ests <- rbind(ests,
                       Trend=vapply(1:ncol(ests),function(j)
-                          trnd[[grep(colnames(ests)[j],names(trnd))]][1]*100,1),
+                          trnd[[grep(colnames(ests)[j],names(trnd))]][1]*1,1),
                       `Trend (Adj)`=vapply(1:ncol(ests),function(j)
-                          trndsAdj[[grep(colnames(ests)[j],names(trnd))]][1]*100,1))
+                          trndsAdj[[grep(colnames(ests)[j],names(trnd))]][1]*1,1))
         ses <- rbind(ses,
                      Trend=vapply(1:ncol(ests),function(j)
-                         trnd[[grep(colnames(ests)[j],names(trnd))]][2]*100,1),
+                         trnd[[grep(colnames(ests)[j],names(trnd))]][2]*1,1),
                      `Trend (Adj)`=vapply(1:ncol(ests),function(j)
-                         trndsAdj[[grep(colnames(ests)[j],names(trnd))]][2]*100,1))
+                         trndsAdj[[grep(colnames(ests)[j],names(trnd))]][2]*1,1))
     }
     if(retEst) return(list(ests=ests,ses=ses))
 
@@ -185,8 +185,8 @@ figFun <- function(nnn,ot,chg=FALSE,erbr=FALSE,...){
     ccc$deaf <- rep(c('Deaf','Hearing'),each=nrow(cccD$tdat))
 
     if(chg){
-        ccc$y <- ccc$y*100
-        ccc$se <- ccc$se*100
+        ccc$y <- ccc$y*1
+        ccc$se <- ccc$se*1
     }
 
     ccc$Year <- ccc$year+2007
@@ -211,7 +211,7 @@ figFun <- function(nnn,ot,chg=FALSE,erbr=FALSE,...){
     if(chg)
         out <- out+ geom_hline(yintercept=0,linetype=2)+ylab('Change Since 2008 (Percentage Points)')
 
-    if(!chg) out <- out+scale_y_continuous(labels=percent)
+    if(!chg) out <- out+scale_y_continuous(labels=function(bb) paste0(bb,'%'))
 
     if(erbr) out <- out+geom_errorbar(aes(ymin=y-1.96*se,ymax=y+1.96*se,width=0.2),position='dodge')
     out+scale_x_continuous(breaks=unique(ccc$Year))+
@@ -316,7 +316,7 @@ resultsTab <- function(ttt,fname='trends.csv'){
         sss <- gsub('DEAR=[12]','',names(rrr))
         if(grepl('25',nnn)) sss <- paste0(sss,'ageRange=25-29')
         rrr <- do.call('rbind',rrr)
-        ddd <- data.frame(lev,deaf,sss,round(rrr[,1:2]*100,round(abs(log(min(rrr[,2]),10)))-2),
+        ddd <- data.frame(lev,deaf,sss,round(rrr[,1:2]*1,round(abs(log(min(rrr[,2]),10)))-2),
                           ifelse(rrr[,4]<0.001,'<0.001',round(rrr[,4],3)),
                           ifelse(rrr[,4]<0.001,'***',ifelse(rrr[,4]<0.01,'**',
                                                             ifelse(rrr[,4]<0.05,'*',
@@ -487,5 +487,7 @@ stars <- function(rej,trend,nn,cc=1){
 
 getSampleSizes <- function(nnn,ot,deaf){
     ccc <- combineDat(nnn,ot,deaf)
-    with(ccc,sapply(unique(tdat[[subCols[1]]]), function(x) round(mean(tdat$Freq[tdat[[subCols[1]]]==x]))))
+    out <- with(ccc,sapply(unique(tdat[[subCols[1]]]), function(x) round(mean(tdat$Freq[tdat[[subCols[1]]]==x]))))
+    if(is.null(names(out))) names(out) <- with(ccc,unique(tdat[[subCols[1]]]))
+    out
 }

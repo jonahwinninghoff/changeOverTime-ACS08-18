@@ -46,6 +46,15 @@ for(i in 1:length(overTime)){
     }
 }
 
+for(i in 1:length(overTime))
+  for(j in 1:length(overTime[[i]]))
+    names(overTime[[i]][[j]]) <- gsub('se2','se',names(overTime[[i]][[j]]))
+
+for(i in 1:length(overTimeAge))
+  for(j in 1:length(overTimeAge[[i]]))
+    names(overTimeAge[[i]][[j]]) <- gsub('se2','se',names(overTimeAge[[i]][[j]]))
+
+
 ```
 
 
