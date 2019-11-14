@@ -121,7 +121,7 @@ for(nn in names(anal)){
 
 ## Data Notes
 
-- Years 2008- 2016
+- Years 20`r names(overTime)[1]`- 20`r names(overTime)[length(overTime)]`
 - Non-institutionalized population
 - Ages 25-64
 - Excludes Puerto Rico
