@@ -1,38 +1,53 @@
 library(survey)
-setwd('../../data/byYear')
+library(tidyverse)
 
-makeDes <- function(year){
+varNames <- tolower(c('ST','SERIALNO','AGEP','DDRS','DEAR','DEYE','DOUT','DPHY','DRATX','DREM','FDEARP','ESR','SCHL','RAC1P','HISP','SEX','PERNP','PINCP','SSIP','WKHP','WKW','ADJINC','PWGTP','INTP', 'OIP', 'PAP', 'RETP', 'SEMP',  'SSP', 'WAGP','RELP','REL',paste0('pwgtp',1:80)))
 
-    print(year)
-    filea <- read.csv(paste0('ss',year,'pusa.csv'))[,c('ST','SERIALNO','AGEP','DDRS','DEAR','DEYE','DOUT','DPHY','DRATX','DREM','FDEARP','ESR','SCHL','RAC1P','HISP','SEX','PERNP','PINCP','SSIP','WKHP','WKW','ADJINC','PWGTP','INTP', 'OIP', 'PAP', 'RETP', 'SEMP',  'SSP', 'WAGP',paste0('pwgtp',1:80))]
-    fileb <- read.csv(paste0('ss',year,'pusb.csv'))[,c('ST','SERIALNO','AGEP','DDRS','DEAR','DEYE','DOUT','DPHY','DRATX','DREM','FDEARP','ESR','SCHL','RAC1P','HISP','SEX','PERNP','PINCP','SSIP','WKHP','WKW','ADJINC','PWGTP','INTP', 'OIP', 'PAP', 'RETP', 'SEMP',  'SSP', 'WAGP',paste0('pwgtp',1:80))]
+makeDes <- function(YR){
 
-    dat <- rbind(filea,fileb)
-    rm(filea,fileb); gc()
+    print(YR)
 
-    hdat <- rbind(read.csv(paste0('ss',year,'husa.csv'))[,c('SERIALNO','TYPE')],
-                  read.csv(paste0('ss',year,'husb.csv'))[,c('SERIALNO','TYPE')])
+    yr <- if(is.integer(YR)){ if(YR<10) paste0('0',YR) else(paste0(YR)) } else YR
+    firstTry <- read_csv(paste0('../../data/byYear/ss',yr,'pusa.csv'), n_max=5)
+    colTypes <- paste(ifelse(tolower(names(firstTry))%in%varNames,'i','-'),collapse='')
 
-    dat$type <- hdat$TYPE[match(dat$SERIALNO,dat$SERIALNO)]
+    datA <- read_csv(paste0('../../data/byYear/ss',yr,'pusa.csv'),col_types=colTypes)
+    names(datA) <- tolower(names(datA))
+    #stopifnot(all.equal(sort(names(datA)),sort(varNames)))
 
-    rm(hdat); gc()
+    datB <- read_csv(paste0('../../data/byYear/ss',yr,'pusb.csv'),col_types=colTypes)
+    names(datB) <- tolower(names(datB))
+
+    if(!setequal(names(datA),names(datB)))
+     warning(paste('datA and datB variable names differ:',
+      paste(c(setdiff(names(datA),names(datB)),setdiff(names(datB),names(datA))),collapse='\n')))
+
+    dat <- bind_rows(datA,datB)
+
+    rm(datA,datB); gc()
+
+    names(dat) <- toupper(names(dat))
+    names(dat)[grep('PWGTP[0-9]+',names(dat))] <- tolower( names(dat)[grep('PWGTP[0-9]+',names(dat))])
+
+    if(is.element('REL',names(dat))& !is.element('RELP',names(dat))) dat$RELP <- dat$REL
+
 
     print('read')
 
-    des <-  svrepdesign(variables=~DEAR+AGEP+ST+
+    des <-  svrepdesign(variables=~DEAR+AGEP+ST+RELP+
                             #DEYE+DOUT+DPHY+DRATX+DREM+  ## right now they're not asking for this
-                            type+SEX+RAC1P+HISP+SCHL+FDEARP,weight=~PWGTP,repweights='pwgtp[0-9]+',scale=4/80,rscales=rep(1,80),mse=TRUE,type='JK1',data=dat)
+                            SEX+RAC1P+HISP+SCHL+FDEARP,weight=~PWGTP,repweights='pwgtp[0-9]+',scale=4/80,rscales=rep(1,80),mse=TRUE,type='JK1',data=dat)
     des$mse <- TRUE
 
     rm(dat); gc()
     des
 }
 
-saveDes <- function(des){
+prepDes <- function(des){
     des <- subset(des,AGEP>=25)
     des <- subset(des,AGEP<65)
 
-    des <- subset(des,type!=2)
+    des <- subset(des,RELP!=16)
 
     des <- subset(des,ST!=72)
 
@@ -51,24 +66,24 @@ saveDes <- function(des){
     des <- update(des,ageRange = cut(AGEP,breaks=seq(24,65,10),#include.lowest=TRUE,
                                      labels=c('25-34','35-44','45-54','55-64'),ordered=TRUE))
 
-
-    save(des,file=paste0('design',year,'.RData'))
+    des
 }
 
-for(year in c('08','09','10','11','12','13','14','15','16')){
-    start <- proc.time()
-    des <- makeDes(year)
-    print('design made')
-    print(proc.time()-start)
+## for(year in c('08','09','10','11','12','13','14','15','16','17')){
+##     start <- proc.time()
+##     des <- makeDes(year)
+##     print('design made')
+##     print(proc.time()-start)
 
-    saveDes(des)
-    rm(des); gc()
+##     des <- prepDes(des)
+##     save(des,file=paste0('../../data/byYear/design',year,'.RData'))
+##     rm(des); gc()
 
-    print((proc.time()-start)/60)
-}
-
-
-
+##     print((proc.time()-start)/60)
+## }
 
 
-setwd('deafCenter/changeOverTime25.34')
+
+
+
+#setwd('deafCenter/changeOverTime25.34')
