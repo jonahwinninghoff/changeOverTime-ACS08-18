@@ -65,34 +65,34 @@ subs <- c('Tot',#'25.29',
           'ByAgeCat',
           'Sex','Race','RaceM','RaceF')#,'RaceSex')
 
-anal <- list()
+analysis <- list()
 pTrend <- list()
 pDiff <- list()
 for(s in subs){
     for(l in c('hs','cc','bach')){
         nn <- paste0(l,s)
         if(s%in%c('Tot','25.29')){
-            anal[[nn]] <- tabFun(nn,overTime,retEst=TRUE)
-            pTrend[[nn]] <- with(anal[[nn]],
+            analysis[[nn]] <- tabFun(nn,overTime,retEst=TRUE)
+            pTrend[[nn]] <- with(analysis[[nn]],
                                  pval(ests[c('Trend','Trend (Adj)'),1],ses[c('Trend','Trend (Adj)'),1]))
-            pDiff[[nn]] <- with(anal[[nn]],
+            pDiff[[nn]] <- with(analysis[[nn]],
                                 c(unadj=diffP(ests['Trend',],ses['Trend',]),
                                   adj=diffP(ests['Trend (Adj)',],ses['Trend (Adj)',])))
-            anal[[nn]]$SS <- getSampleSizes(nn,overTime,NULL)
+            analysis[[nn]]$SS <- getSampleSizes(nn,overTime,NULL)
         }
         else{
-            anal[[nn]] <- list(deaf=tabFun(nn,overTime,deaf=TRUE,retEst=TRUE),
+            analysis[[nn]] <- list(deaf=tabFun(nn,overTime,deaf=TRUE,retEst=TRUE),
                                hear=tabFun(nn,overTime,deaf=FALSE,retEst=TRUE))
-            pTrend[[nn]] <- with(anal[[nn]]$deaf,
+            pTrend[[nn]] <- with(analysis[[nn]]$deaf,
                                  cbind(unadj=pval(ests['Trend',],ses['Trend',]),
                                        adj=pval(ests['Trend (Adj)',],ses['Trend (Adj)',])))
-            pDiff[[nn]] <- with(anal[[nn]], do.call('rbind',lapply(1:ncol(deaf[[1]]), function(cc)
+            pDiff[[nn]] <- with(analysis[[nn]], do.call('rbind',lapply(1:ncol(deaf[[1]]), function(cc)
                 c(unadj=diffP(c(deaf$ests['Trend',cc],hear$ests['Trend',cc]),
                       c(deaf$ses['Trend',cc],hear$ses['Trend',cc])),
                   adj=diffP(c(deaf$ests['Trend (Adj)',cc],hear$ests['Trend (Adj)',cc]),
                             c(deaf$ses['Trend (Adj)',cc],hear$ses['Trend (Adj)',cc]))))))
-            anal[[nn]]$deafSS <- getSampleSizes(nn,overTime,TRUE)[colnames(anal[[nn]]$deaf$ests)]
-            anal[[nn]]$hearSS <- getSampleSizes(nn,overTime,FALSE)[colnames(anal[[nn]]$deaf$ests)]
+            analysis[[nn]]$deafSS <- getSampleSizes(nn,overTime,TRUE)[colnames(analysis[[nn]]$deaf$ests)]
+            analysis[[nn]]$hearSS <- getSampleSizes(nn,overTime,FALSE)[colnames(analysis[[nn]]$deaf$ests)]
         }
     }
 }
@@ -102,17 +102,17 @@ rejAdj <- lapply(alphas,function(alpha) mult4(pTrend,pDiff,alpha,TRUE))
 names(rejAdj) <- alphas
 #rejUnadj <- lapply(alphas,function(alpha) mult(pTrend,pDiff,alpha,FALSE))
 
-for(nn in names(anal)){
-    anal[[nn]]$trendStars <-
-        if(names(anal[[nn]])[1]=='deaf')
-            rbind(unadj=rep('',ncol(anal[[nn]]$deaf[[1]])),
-                  adj=vapply(1:ncol(anal[[nn]]$deaf[[1]]),function(cc) stars(rejAdj,'trend',nn,cc),'a'))
+for(nn in names(analysis)){
+    analysis[[nn]]$trendStars <-
+        if(names(analysis[[nn]])[1]=='deaf')
+            rbind(unadj=rep('',ncol(analysis[[nn]]$deaf[[1]])),
+                  adj=vapply(1:ncol(analysis[[nn]]$deaf[[1]]),function(cc) stars(rejAdj,'trend',nn,cc),'a'))
         else c(unadj='',
                adj=stars(rejAdj,'trend',nn,1))
-    anal[[nn]]$diffStars <-
-        if(names(anal[[nn]])[1]=='deaf')
-            rbind(unadj=rep('',ncol(anal[[nn]]$deaf[[1]])),
-                  adj=vapply(1:ncol(anal[[nn]]$deaf[[1]]),function(cc) stars(rejAdj,'diff',nn,cc),'a'))
+    analysis[[nn]]$diffStars <-
+        if(names(analysis[[nn]])[1]=='deaf')
+            rbind(unadj=rep('',ncol(analysis[[nn]]$deaf[[1]])),
+                  adj=vapply(1:ncol(analysis[[nn]]$deaf[[1]]),function(cc) stars(rejAdj,'diff',nn,cc),'a'))
         else c(unadj='',adj=stars(rejAdj,'diff',nn,1))
 }
 
@@ -169,9 +169,9 @@ denoted with a $\pm$ symbol.
 These, combined with the estimates themselves, define 95% confidence
 intervals for the appropriate population quantity.
 For instance, we estimate that in 2016
-`r round(es <- anal$hsSex$deaf$ests['2016','Female'],1)`% of deaf females had
+`r round(es <- analysis$hsSex$deaf$ests['2016','Female'],1)`% of deaf females had
 attained a high school diploma, with a margin of error of
-`r round(me <- 1.96*anal$hsSex$deaf$ses['2016','Female'],2)` percentage
+`r round(me <- 1.96*analysis$hsSex$deaf$ses['2016','Female'],2)` percentage
 points.
 Therefore, a confidence interval for the true percentage of female
 deaf Americans with a high school diploma in 2016 is
@@ -230,7 +230,7 @@ associated null hypotheses were not rejected at the 0.05 level.
 
 \newline \newline \newline
 ```{r HStotTable,results='markdown'}
-kable(tabFinish(anal[['hsTot']]))
+kable(tabFinish(analysis[['hsTot']]))
 ```
 
 Table: High School completion from 2008-2016.
@@ -249,7 +249,7 @@ figFun('hsTot',overTime,chg=TRUE,erbr=TRUE)+ggtitle('High School Diploma or Equi
 
 \newline \newline \newline
 ```{r CCtotTable,results='markdown'}
-kable(tabFinish(anal[['ccTot']]))
+kable(tabFinish(analysis[['ccTot']]))
 ```
 
 Table: Associates completion from 2008-2016.
@@ -266,7 +266,7 @@ figFun('ccTot',overTime,chg=TRUE,erbr=TRUE)+ggtitle('Associates Diploma or Equiv
 ### Bachelors
 \newline \newline \newline
 ```{r BAtotTable,results='markdown'}
-kable(tabFinish(anal[['bachTot']]))
+kable(tabFinish(analysis[['bachTot']]))
 ```
 
 Table: Bachelor's degree attainment from 2008-2016.
@@ -291,7 +291,7 @@ figFun('bachTot',overTime,chg=TRUE,erbr=TRUE)+ggtitle('Bachelor\'s Degree or Equ
 \newline \newline \newline
 ```{r HSSexDeaf,results='markdown'}
 
-kable(tabFinish(anal[['hsSex']],TRUE))
+kable(tabFinish(analysis[['hsSex']],TRUE))
 ```
 
 Table: Percentage of deaf Americans by gender attaining a
@@ -301,7 +301,7 @@ High School diploma or equivalent.
 
 \newline \newline \newline
 ```{r HSSexHear,results='markdown'}
-kable(tabFinish(anal[['hsSex']],deaf=FALSE))
+kable(tabFinish(analysis[['hsSex']],deaf=FALSE))
 ```
 
 Table: Percentage of hearing Americans by gender attaining a
@@ -310,7 +310,7 @@ High School diploma or equivalent.
 \newline \newline \newline
 ```{r HSbySexDeafHearDiff,results='markdown'}
 
-kable(diffDeafHear(anal[['hsSex']]))
+kable(diffDeafHear(analysis[['hsSex']]))
 ```
 
 Table: Differences in growth and trends between deaf and hearing
@@ -333,7 +333,7 @@ figFun('hsSex',overTime,chg=TRUE,erbr=FALSE)+ggtitle('High School Diploma or Equ
 \newline \newline \newline
 ```{r CCSexDeaf,results='markdown'}
 
-kable(tabFinish(anal[['ccSex']],TRUE))
+kable(tabFinish(analysis[['ccSex']],TRUE))
 ```
 
 Table: Percentage of deaf Americans by gender attaining a
@@ -343,7 +343,7 @@ Associates diploma or equivalent.
 
 \newline \newline \newline
 ```{r CCSexHear,results='markdown'}
-kable(tabFinish(anal[['ccSex']],deaf=FALSE))
+kable(tabFinish(analysis[['ccSex']],deaf=FALSE))
 ```
 
 Table: Percentage of hearing Americans by gender attaining a
@@ -352,7 +352,7 @@ Associates diploma or equivalent.
 \newline \newline \newline
 ```{r CCbySexDeafHearDiff,results='markdown'}
 
-kable(diffDeafHear(anal[['ccSex']]))
+kable(diffDeafHear(analysis[['ccSex']]))
 ```
 
 Table: Differences in growth and trends between deaf and hearing
@@ -373,7 +373,7 @@ figFun('ccSex',overTime,chg=TRUE,erbr=FALSE)+ggtitle('Associates Diploma or Equi
 ### Bachelors
 \newline \newline \newline
 ```{r BASexDeaf,results='markdown'}
-kable(tabFinish(anal[['bachSex']],TRUE))
+kable(tabFinish(analysis[['bachSex']],TRUE))
 ```
 
 Table: Percentage of deaf Americans by gender attaining a
@@ -383,7 +383,7 @@ Bachelor's degree.
 
 \newline \newline \newline
 ```{r BASexHear,results='markdown'}
-kable(tabFinish(anal[['bachSex']],FALSE))
+kable(tabFinish(analysis[['bachSex']],FALSE))
 ```
 
 Table: Percentage of hearing Americans by gender attaining a
@@ -391,7 +391,7 @@ Bachelor's degree.
 
 \newline \newline \newline
 ```{r BAbySexDeafHearDiff,results='markdown'}
-kable(diffDeafHear(anal[['bachSex']]))
+kable(diffDeafHear(analysis[['bachSex']]))
 ```
 
 Table: Differences in growth and trends between deaf and hearing
@@ -414,7 +414,7 @@ figFun('bachSex',overTime,chg=TRUE,erbr=FALSE)+ggtitle('Bachelor\'s Degree or Eq
 
 \newline \newline \newline
 ```{r HSByAgeCatDeaf,results='markdown'}
-kable(tabFinish(anal[['hsByAgeCat']],TRUE))
+kable(tabFinish(analysis[['hsByAgeCat']],TRUE))
 ```
 
 Table: Percentage of deaf Americans by age category attaining a
@@ -424,7 +424,7 @@ High School diploma or equivalent.
 
 \newline \newline \newline
 ```{r HSByAgeCatHear,results='markdown'}
-kable(tabFinish(anal[['hsByAgeCat']],FALSE))
+kable(tabFinish(analysis[['hsByAgeCat']],FALSE))
 ```
 
 Table: Percentage of hearing Americans by age category attaining a
@@ -432,7 +432,7 @@ High School diploma or equivalent.
 
 \newline \newline \newline
 ```{r HSbyByAgeCatDeafHearDiff,results='markdown'}
-kable(diffDeafHear(anal[['hsByAgeCat']]))
+kable(diffDeafHear(analysis[['hsByAgeCat']]))
 ```
 
 Table: Differences in growth and trends between deaf and hearing
@@ -454,7 +454,7 @@ figFun('hsByAgeCat',overTime,chg=TRUE,erbr=FALSE)+ggtitle('High School Diploma o
 
 \newline \newline \newline
 ```{r CCByAgeCatDeaf,results='markdown'}
-kable(tabFinish(anal[['ccByAgeCat']],TRUE))
+kable(tabFinish(analysis[['ccByAgeCat']],TRUE))
 ```
 
 Table: Percentage of deaf Americans by age category attaining a
@@ -464,7 +464,7 @@ Associates diploma or equivalent.
 
 \newline \newline \newline
 ```{r CCByAgeCatHear,results='markdown'}
-kable(tabFinish(anal[['ccByAgeCat']],FALSE))
+kable(tabFinish(analysis[['ccByAgeCat']],FALSE))
 ```
 
 Table: Percentage of hearing Americans by age category attaining a
@@ -472,7 +472,7 @@ Associates diploma or equivalent.
 
 \newline \newline \newline
 ```{r CCbyByAgeCatDeafHearDiff,results='markdown'}
-kable(diffDeafHear(anal[['ccByAgeCat']]))
+kable(diffDeafHear(analysis[['ccByAgeCat']]))
 ```
 
 Table: Differences in growth and trends between deaf and hearing
@@ -492,7 +492,7 @@ figFun('ccByAgeCat',overTime,chg=TRUE,erbr=FALSE)+ggtitle('Associates Diploma or
 ### Bachelors
 \newline \newline \newline
 ```{r BAByAgeCatDeaf,results='markdown'}
-kable(tabFinish(anal[['bachByAgeCat']],TRUE))
+kable(tabFinish(analysis[['bachByAgeCat']],TRUE))
 ```
 
 Table: Percentage of deaf Americans by age category attaining a
@@ -502,7 +502,7 @@ Bachelor's degree.
 
 \newline \newline \newline
 ```{r BAByAgeCatHear,results='markdown'}
-kable(tabFinish(anal[['bachByAgeCat']],FALSE))
+kable(tabFinish(analysis[['bachByAgeCat']],FALSE))
 ```
 
 Table: Percentage of hearing Americans by age category attaining a
@@ -511,7 +511,7 @@ Bachelor's degree.
 
 \newline \newline \newline
 ```{r BACHByAgeCatHearDiff,results='markdown'}
-kable(diffDeafHear(anal[['bachByAgeCat']]))
+kable(diffDeafHear(analysis[['bachByAgeCat']]))
 ```
 
 Table: Differences in growth and trends between deaf and hearing
@@ -536,7 +536,7 @@ figFun('bachByAgeCat',overTime,chg=TRUE,erbr=FALSE)+ggtitle('Bachelor\'s Degree 
 
 \newline \newline \newline
 ```{r HSRaceDeaf,results='markdown'}
-kable(tabFinish(anal[['hsRace']],TRUE))
+kable(tabFinish(analysis[['hsRace']],TRUE))
 ```
 
 Table: Percentage of deaf Americans by race/ethnicity attaining a
@@ -546,7 +546,7 @@ High School diploma or equivalent.
 
 \newline \newline \newline
 ```{r HSRaceHear,results='markdown'}
-kable(tabFinish(anal[['hsRace']],FALSE))
+kable(tabFinish(analysis[['hsRace']],FALSE))
 ```
 
 Table: Percentage of hearing Americans by race/ethnicity attaining a
@@ -554,7 +554,7 @@ High School diploma or equivalent.
 
 \newline \newline \newline
 ```{r HSbyRaceDeafHearDiff,results='markdown'}
-kable(diffDeafHear(anal[['hsRace']]))
+kable(diffDeafHear(analysis[['hsRace']]))
 ```
 
 Table: Differences in growth and trends between deaf and hearing
@@ -576,7 +576,7 @@ figFun('hsRace',overTime,chg=TRUE,erbr=FALSE)+ggtitle('High School Diploma or Eq
 
 \newline \newline \newline
 ```{r CCRaceDeaf,results='markdown'}
-kable(tabFinish(anal[['ccRace']],TRUE))
+kable(tabFinish(analysis[['ccRace']],TRUE))
 ```
 
 Table: Percentage of deaf Americans by race/ethnicity attaining a
@@ -586,7 +586,7 @@ Associates diploma or equivalent.
 
 \newline \newline \newline
 ```{r CCRaceHear,results='markdown'}
-kable(tabFinish(anal[['ccRace']],FALSE))
+kable(tabFinish(analysis[['ccRace']],FALSE))
 ```
 
 Table: Percentage of hearing Americans by race/ethnicity attaining a
@@ -594,7 +594,7 @@ Associates diploma or equivalent.
 
 \newline \newline \newline
 ```{r CCbyRaceDeafHearDiff,results='markdown'}
-kable(diffDeafHear(anal[['ccRace']]))
+kable(diffDeafHear(analysis[['ccRace']]))
 ```
 
 Table: Differences in growth and trends between deaf and hearing
@@ -614,7 +614,7 @@ figFun('ccRace',overTime,chg=TRUE,erbr=FALSE)+ggtitle('Associates Diploma or Equ
 ### Bachelors
 \newline \newline \newline
 ```{r BARaceDeaf,results='markdown'}
-kable(tabFinish(anal[['bachRace']],TRUE))
+kable(tabFinish(analysis[['bachRace']],TRUE))
 ```
 
 Table: Percentage of deaf Americans by race/ethnicity attaining a
@@ -624,7 +624,7 @@ Bachelor's degree.
 
 \newline \newline \newline
 ```{r BARaceHear,results='markdown'}
-kable(tabFinish(anal[['bachRace']],FALSE))
+kable(tabFinish(analysis[['bachRace']],FALSE))
 ```
 
 Table: Percentage of hearing Americans by race/ethnicity attaining a
@@ -633,7 +633,7 @@ Bachelor's degree.
 
 \newline \newline \newline
 ```{r BACHRaceHearDiff,results='markdown'}
-kable(diffDeafHear(anal[['bachRace']]))
+kable(diffDeafHear(analysis[['bachRace']]))
 ```
 
 Table: Differences in growth and trends between deaf and hearing
@@ -657,7 +657,7 @@ figFun('bachRace',overTime,chg=TRUE,erbr=FALSE)+ggtitle('Bachelor\'s Degree or E
 #### Deaf Female
 \newline \newline \newline
 ```{r HSRaceSexDeafF,results='markdown'}
-kable(tabFinish(anal[['hsRaceF']],TRUE))
+kable(tabFinish(analysis[['hsRaceF']],TRUE))
 ```
 
 Table: Percentage of female deaf Americans by race/ethnicity attaining a
@@ -666,7 +666,7 @@ High School diploma or equivalent.
 #### Deaf Male
 \newline \newline \newline
 ```{r HSRaceSexDeafM,results='markdown'}
-kable(tabFinish(anal[['hsRaceM']],TRUE))
+kable(tabFinish(analysis[['hsRaceM']],TRUE))
 ```
 
 Table: Percentage of male deaf Americans by race/ethnicity attaining a
@@ -676,7 +676,7 @@ High School diploma or equivalent.
 #### Hearing Female
 \newline \newline \newline
 ```{r HSRaceSexHearF,results='markdown'}
-kable(tabFinish(anal[['hsRaceF']],FALSE))
+kable(tabFinish(analysis[['hsRaceF']],FALSE))
 ```
 
 Table: Percentage of female hearing Americans by race/ethnicity attaining a
@@ -685,7 +685,7 @@ High School diploma or equivalent.
 #### Hearing Male
 \newline \newline \newline
 ```{r HSRaceSexHearM,results='markdown'}
-kable(tabFinish(anal[['hsRaceM']],FALSE))
+kable(tabFinish(analysis[['hsRaceM']],FALSE))
 ```
 
 Table: Percentage of male hearing Americans by race/ethnicity attaining a
@@ -694,7 +694,7 @@ High School diploma or equivalent.
 #### Deaf Hearing Differences by Race: Female
 \newline \newline \newline
 ```{r results='markdown'}
-kable(diffDeafHear(anal[['hsRaceF']]))
+kable(diffDeafHear(analysis[['hsRaceF']]))
 ```
 
 Table: Differences in growth and trends between female deaf and hearing
@@ -704,7 +704,7 @@ growth for deaf Americans.
 #### Deaf Hearing Differences by Race: Male
 \newline \newline \newline
 ```{r results='markdown'}
-kable(diffDeafHear(anal[['hsRaceM']]))
+kable(diffDeafHear(analysis[['hsRaceM']]))
 ```
 
 Table: Differences in growth and trends between male deaf and hearing
@@ -736,7 +736,7 @@ figFun('hsRaceM',overTime,chg=TRUE,erbr=FALSE)+ylab('High School Completion')+gg
 #### Deaf Female
 \newline \newline \newline
 ```{r CCRaceSexDeafF,results='markdown'}
-kable(tabFinish(anal[['ccRaceF']],TRUE))
+kable(tabFinish(analysis[['ccRaceF']],TRUE))
 ```
 
 Table: Percentage of female deaf Americans by race/ethnicity attaining a
@@ -745,7 +745,7 @@ Associates diploma or equivalent.
 #### Deaf Male
 \newline \newline \newline
 ```{r CCRaceSexDeafM,results='markdown'}
-kable(tabFinish(anal[['ccRaceM']],TRUE))
+kable(tabFinish(analysis[['ccRaceM']],TRUE))
 ```
 
 Table: Percentage of male deaf Americans by race/ethnicity attaining a
@@ -755,7 +755,7 @@ Associates diploma or equivalent.
 #### Hearing Female
 \newline \newline \newline
 ```{r CCRaceSexHearF,results='markdown'}
-kable(tabFinish(anal[['ccRaceF']],FALSE))
+kable(tabFinish(analysis[['ccRaceF']],FALSE))
 ```
 
 Table: Percentage of female hearing Americans by race/ethnicity attaining a
@@ -764,7 +764,7 @@ Associates diploma or equivalent.
 #### Hearing Male
 \newline \newline \newline
 ```{r CCRaceSexHearM,results='markdown'}
-kable(tabFinish(anal[['ccRaceM']],FALSE))
+kable(tabFinish(analysis[['ccRaceM']],FALSE))
 ```
 
 Table: Percentage of male hearing Americans by race/ethnicity attaining a
@@ -773,7 +773,7 @@ Associates diploma or equivalent.
 #### Deaf Hearing Differences by Race: Female
 \newline \newline \newline
 ```{r results='markdown'}
-kable(diffDeafHear(anal[['ccRaceF']]))
+kable(diffDeafHear(analysis[['ccRaceF']]))
 ```
 
 Table: Differences in growth and trends between female deaf and hearing
@@ -783,7 +783,7 @@ growth for deaf Americans.
 #### Deaf Hearing Differences by Race: Male
 \newline \newline \newline
 ```{r results='markdown'}
-kable(diffDeafHear(anal[['ccRaceM']]))
+kable(diffDeafHear(analysis[['ccRaceM']]))
 ```
 
 Table: Differences in growth and trends between male deaf and hearing
@@ -818,7 +818,7 @@ figFun('ccRaceM',overTime,chg=TRUE,erbr=FALSE)+ylab('Associates Completion')+ggt
 #### Deaf Female
 \newline \newline \newline
 ```{r BACHRaceSexDeafF,results='markdown'}
-kable(tabFinish(anal[['bachRaceF']],TRUE))
+kable(tabFinish(analysis[['bachRaceF']],TRUE))
 ```
 
 Table: Percentage of female deaf Americans by race/ethnicity attaining a
@@ -828,7 +828,7 @@ Bachelors degree or equivalent.
 #### Deaf Male
 \newline \newline \newline
 ```{r BACHRaceSexDeafM,results='markdown'}
-kable(tabFinish(anal[['bachRaceM']],TRUE))
+kable(tabFinish(analysis[['bachRaceM']],TRUE))
 ```
 
 Table: Percentage of male deaf Americans by race/ethnicity attaining a
@@ -838,7 +838,7 @@ Bachelors degree or equivalent.
 #### Hearing Female
 \newline \newline \newline
 ```{r BACHRaceSexHearF,results='markdown'}
-kable(tabFinish(anal[['bachRaceF']],FALSE))
+kable(tabFinish(analysis[['bachRaceF']],FALSE))
 ```
 
 Table: Percentage of female hearing Americans by race/ethnicity attaining a
@@ -847,7 +847,7 @@ Bachelors degree or equivalent.
 #### Hearing Male
 \newline \newline \newline
 ```{r BACHRaceSexHearM,results='markdown'}
-kable(tabFinish(anal[['bachRaceM']],FALSE))
+kable(tabFinish(analysis[['bachRaceM']],FALSE))
 ```
 
 Table: Percentage of male hearing Americans by race/ethnicity attaining a
@@ -856,7 +856,7 @@ Bachelors degree or equivalent.
 #### Deaf Hearing Differences by Race: Female
 \newline \newline \newline
 ```{r results='markdown'}
-kable(diffDeafHear(anal[['bachRaceF']]))
+kable(diffDeafHear(analysis[['bachRaceF']]))
 ```
 
 Table: Differences in growth and trends between female deaf and hearing
@@ -866,7 +866,7 @@ growth for deaf Americans.
 #### Deaf Hearing Differences by Race: Male
 \newline \newline \newline
 ```{r results='markdown'}
-kable(diffDeafHear(anal[['bachRaceM']]))
+kable(diffDeafHear(analysis[['bachRaceM']]))
 ```
 
 Table: Differences in growth and trends between male deaf and hearing
