@@ -1,0 +1,176 @@
+---
+title: "Trends in Educational Attainment: Results"
+date: '`r format(Sys.Date(), "%B %d, %Y")`'
+output: word_document
+---
+
+```{r textPrelim}
+opts_chunk$set(
+echo=FALSE,results='hide',warning = FALSE,message = FALSE,error=FALSE,cache=FALSE
+)
+```
+
+```{r textPrelim2, cache=TRUE}
+library(knitr)
+knit('overTime.Rmd')
+knit('gapsOverTime.Rmd')
+```
+
+```{r textFuncs}
+pfun <- function(strs)
+  switch(strs,
+    `***`="p<0.001",
+    `**`="p<0.01",
+    `*`="p<0.05",
+    `.`="p<0.1")
+
+years <- paste0('20',names(overTime)[1],' to 20',names(overTime)[length(overTime)])
+```
+
+```{r colnames}
+for(i in 1:length(analysis)){
+  if(NCOL(analysis[[i]]$trendStars)>1)
+    colnames(analysis[[i]]$trendStars) <-
+      if('deaf'%in%names(analysis[[i]])) colnames(analysis[[i]]$deaf$ests) else colnames(analysis[[i]]$ests)
+}
+```
+
+```{r colnamesGaps}
+for(i in 1:length(gaps)){
+  if(length(gaps[[i]]$stars)>1)
+    names(gaps[[i]]$stars) <- colnames(gaps[[i]]$ests)
+}
+```
+
+# High School Attainment
+
+From `r years`, high school
+completion rates for deaf people grew by roughly
+`r round(analysis$hsTot$ests['Growth',1])` percentage
+points--a rate of `r round(analysis$hsTot$ests['Trend (Adj)',1],1)`
+percentage points per year (PPY) (`r pfun(analysis$hsTot$trendStars[2])`)
+(Table 1).
+When the sample was restricted to deaf people ages 25-34, the
+estimated trend over time was `r round(analysis$hsByAgeCat$deaf$ests['Trend (Adj)',1],1)` PPY
+(`r pfun(analysis$hsByAgeCat$trendStars[2,1])`).
+
+High school completion trends were similar for deaf males and females, at
+ `r round(analysis$hsSex$deaf$ests['Trend (Adj)','Male'],1)`
+(`r pfun(analysis$hsSex$trendStars[2,2])`), and
+ `r round(analysis$hsSex$deaf$ests['Trend (Adj)','Female'],1)`
+(`r pfun(analysis$hsSex$trendStars[2,1])`) PPY, respectively.
+Trends were more pronounced for deaf Latnix
+(`r round(analysis$hsRace$deaf$ests['Trend (Adj)','Hispanic'],1)` PPY;
+ `r pfun(analysis$hsRace$trendStars[2,'Hispanic'])`) and deaf African American
+ (`r round(analysis$hsRace$deaf$ests['Trend (Adj)','African American'],1)` PPY;
+ `r pfun(analysis$hsRace$trendStars[2,'African American'])`) people than
+for deaf white people
+(`r round(analysis$hsRace$deaf$ests['Trend (Adj)','White'],1)` PPY;
+ `r pfun(analysis$hsRace$trendStars[2,'White'])`).
+ Estimated trends for other racial and ethnic groups were too imprecise to draw conclusions.
+ Within racial and ethnic categories, trends in high school completion were similar between deaf females and deaf males, though we estimated a higher trend for deaf African American Females
+(`r round(analysis$hsRaceF$deaf$ests['Trend (Adj)','African American'],1)` PPY;
+ `r pfun(analysis$hsRaceF$trendStars[2,'African American'])`) than for males
+ (`r round(analysis$hsRaceM$deaf$ests['Trend (Adj)','African American'],1)` PPY;
+ `r pfun(analysis$hsRaceM$trendStars[2,'African American'])`).
+
+## Trends in High School Attainment Gaps
+
+From `r years` the age-adjusted hearing-deaf gaps in high school completion narrowed from
+roughly `r round(gaps$hsTot$ests['2008',1],1)` in 2008 to `r round(gaps$hsTot$ests['2018',1],1)` in 2018, a trend of rougly `r round(gaps$hsTot$ests['trend',1],2)` PPY
+(`r pfun(gaps$hsTot$stars)`) (the negative sign indicates a narrowing gap).
+
+Curously, this acheivement gap trend is not apparent in the 25-34 age group; instead, it appears to have been driven largely by changes in the proportions of deaf, but not hearing, people ages 35-54 reporting high school diploma attainment.
+
+The high school gap appeared to narrow more for women
+(`r round(gaps$hsSex$ests['trend','Female'],2)` PPY; `r pfun(gaps$hsSex$stars['Female'])`)
+than for men
+(`r round(gaps$hsSex$ests['trend','Male'],2)` PPY; `r pfun(gaps$hsSex$stars['Male'])`)
+though the difference in trends is not statistically significant.
+Nevertheless, as of 2018 the high school completion gap remains higher for women, at
+`r round(gaps$hsSex$ests['2018','Female'],2)` than for men `r round(gaps$hsSex$ests['2018','Male'],2)`.
+There was little evidence of differeng trends between racial/ethnic groups, or within racial ethnic groups between genders.
+That said, the estimated trend in the high school acheivement gap for African American Women was particularly pronounced--`r round(gaps$hsRaceF$ests['trend','African American'],2)` PPY (`r pfun(gaps$hsRaceF$stars['African American'])`).
+
+# Associate's Degree Attainment
+
+From `r years`, Associate's Degree
+completion rates for deaf people grew by roughly
+`r round(analysis$ccTot$ests['Growth',1])` percentage
+points--a rate of `r round(analysis$ccTot$ests['Trend (Adj)',1],1)`
+percentage points per year (PPY) (`r pfun(analysis$ccTot$trendStars[2])`)
+(Table 1).
+When the sample was restricted to deaf people ages 25-34, the
+estimated trend over time was `r round(analysis$ccByAgeCat$deaf$ests['Trend (Adj)',1],1)` PPY
+(`r pfun(analysis$ccByAgeCat$trendStars[2,1])`).
+
+Associate's Degree completion trends were similar for deaf males and females, at
+ `r round(analysis$ccSex$deaf$ests['Trend (Adj)','Male'],1)`
+(`r pfun(analysis$ccSex$trendStars[2,2])`), and
+ `r round(analysis$ccSex$deaf$ests['Trend (Adj)','Female'],1)`
+(`r pfun(analysis$ccSex$trendStars[2,1])`) PPY, respectively.
+Trends were similar for deaf Latnix
+(`r round(analysis$ccRace$deaf$ests['Trend (Adj)','Hispanic'],1)` PPY;
+ `r pfun(analysis$ccRace$trendStars[2,'Hispanic'])`), deaf African American
+ (`r round(analysis$ccRace$deaf$ests['Trend (Adj)','African American'],1)` PPY;
+ `r pfun(analysis$ccRace$trendStars[2,'African American'])`), and
+ deaf white people
+(`r round(analysis$ccRace$deaf$ests['Trend (Adj)','White'],1)` PPY;
+ `r pfun(analysis$ccRace$trendStars[2,'White'])`).
+ Estimated trends for other racial and ethnic groups were too imprecise to draw conclusions.
+ Within racial and ethnic categories, trends in Associate's Degree completion were similar between deaf females and deaf males.
+
+## Trends in Associate's Degree Attainment Gaps
+
+From `r years` the age-adjusted hearing-deaf gaps in the proportion of people earning at least an Associate's Degree narrowed from
+roughly `r round(gaps$ccTot$ests['2008',1],1)` in 2008 to `r round(gaps$ccTot$ests['2018',1],1)` in 2018, a trend of rougly `r round(gaps$ccTot$ests['trend',1],2)` PPY
+(`r pfun(gaps$ccTot$stars)`).
+
+This trend appears to be driven entirely by changes in in the deaf-hearing associate's degree gap for men, which narrowed by approximately `r round(gaps$ccSex$ests['trend','Male'],2)` PPY (`r pfun(gaps$ccSex$stars['Male'])`).
+In contrast, the gap for women narrowed by
+ `r round(gaps$ccSex$ests['trend','Female'],2)` PPY (p=`r round(gaps$ccSex$pvals['Female'],2)`).
+
+Trends in the associate's degree gap for age or racial/ethnic categories were mostly too small or measured with too much noise to draw conclusions.
+One exception is the trend in the gap for white males, which was
+`r round(gaps$ccRaceM$ests['trend','White'],2)` PPY (`r pfun(gaps$ccRaceM$stars['White'])`), comparable to the estimated trends in gaps African American and Latinx males,
+`r round(gaps$ccRaceM$ests['trend','African American'],2)` and `r round(gaps$ccRaceM$ests['trend','Hispanic'],2)` PPY, respectively, which, however, were not statistically significant due to imprecision.
+Curiously, the gap for males in the "Other" racial/ethnic category appeared to _increase_ at a rate of
+`r round(gaps$ccRaceM$ests['trend','Other'],2)` (`r pfun(gaps$ccRaceM$stars['Other'])`), though this is likely a spurious result.
+
+
+# Bachelor's Degree Attainment
+
+From `r years`, Bachelor's Degree
+completion rates for deaf people grew by roughly
+`r round(analysis$bachTot$ests['Growth',1])` percentage
+points--a rate of `r round(analysis$bachTot$ests['Trend (Adj)',1],1)`
+percentage points per year (PPY) (`r pfun(analysis$bachTot$trendStars[2])`)
+(Table 1).
+When the sample was restricted to deaf people ages 25-34, the
+estimated trend over time was `r round(analysis$bachByAgeCat$deaf$ests['Trend (Adj)',1],1)` PPY
+(`r pfun(analysis$bachByAgeCat$trendStars[2,1])`).
+
+Bachelor's Degree completion trends were somewhat higher for deaf females than males, at
+ `r round(analysis$bachSex$deaf$ests['Trend (Adj)','Female'],1)`
+(`r pfun(analysis$bachSex$trendStars[2,'Female'])`), and
+ `r round(analysis$bachSex$deaf$ests['Trend (Adj)','Male'],1)`
+(`r pfun(analysis$bachSex$trendStars[2,'Male'])`) PPY, respectively.
+Trends were similar for deaf Latnix
+(`r round(analysis$bachRace$deaf$ests['Trend (Adj)','Hispanic'],1)` PPY;
+ `r pfun(analysis$bachRace$trendStars[2,'Hispanic'])`), deaf African American
+ (`r round(analysis$bachRace$deaf$ests['Trend (Adj)','African American'],1)` PPY;
+ `r pfun(analysis$bachRace$trendStars[2,'African American'])`), and
+ deaf white people
+(`r round(analysis$bachRace$deaf$ests['Trend (Adj)','White'],1)` PPY;
+ `r pfun(analysis$bachRace$trendStars[2,'White'])`).
+ Estimated trends for other racial and ethnic groups were too imprecise to draw conclusions.
+ Within racial and ethnic categories, trends in Bachelor's Degree completion were similar between deaf females and deaf males.
+
+## Trends in Bachelor's Degree Attainment Gaps
+
+The trend in the deaf-hearing gap in Bachelor's degree attainment was estimated as
+`r round(gaps$bachTot$ests['trend'],2)` PPY; this estimate was statistically insignificant
+(p=`r round(gaps$bachTot$pvals,2)`).
+However, the BA gap for males did appear to narrow, at a rate of
+`r round(gaps$bachSex$ests['trend','Male'],2)` PPY (`r pfun(gaps$bachSex$stars['Male'])`).
+None of the other subgroups we studied exhibited a statistically significant trend in the bachelor's degree gap from `r years`.

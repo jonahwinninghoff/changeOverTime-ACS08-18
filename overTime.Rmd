@@ -235,7 +235,7 @@ associated null hypotheses were not rejected at the 0.05 level.
 
 
 
-## High School
+# High School
 
 \newline \newline \newline
 ```{r HStotTable,results='markdown'}
@@ -275,14 +275,14 @@ Table: Percentage of hearing Americans by gender attaining a
 High School diploma or equivalent.
 
 \newline \newline \newline
-```{r HSbySexDeafHearDiff,results='markdown'}
+```{r HSbySexDeafHearDiff,results='markdown',include=FALSE}
 
-kable(diffDeafHear(analysis[['hsSex']]))
+#kable(diffDeafHear(analysis[['hsSex']]))
 ```
 
-Table: Differences in growth and trends between deaf and hearing
-Americans for males and females. Positive Differences indicate faster
-growth for deaf Americans.
+<!-- Table: Differences in growth and trends between deaf and hearing -->
+<!-- Americans for males and females. Positive Differences indicate faster -->
+<!-- growth for deaf Americans. -->
 
 
 
@@ -316,13 +316,13 @@ Table: Percentage of hearing Americans by age category attaining a
 High School diploma or equivalent.
 
 \newline \newline \newline
-```{r HSbyByAgeCatDeafHearDiff,results='markdown'}
-kable(diffDeafHear(analysis[['hsByAgeCat']]))
+```{r HSbyByAgeCatDeafHearDiff,include=FALSE,results='markdown'}
+#kable(diffDeafHear(analysis[['hsByAgeCat']]))
 ```
 
-Table: Differences in growth and trends between deaf and hearing
-Americans for each age category. Positive Differences indicate faster
-growth for deaf Americans.
+<!-- Table: Differences in growth and trends between deaf and hearing -->
+<!-- Americans for each age category. Positive Differences indicate faster -->
+<!-- growth for deaf Americans. -->
 
 
 \newline \newline \newline
@@ -354,13 +354,13 @@ Table: Percentage of hearing Americans by race/ethnicity attaining a
 High School diploma or equivalent.
 
 \newline \newline \newline
-```{r HSbyRaceDeafHearDiff,results='markdown'}
-kable(diffDeafHear(analysis[['hsRace']]))
+```{r HSbyRaceDeafHearDiff,include=FALSE,results='markdown'}
+#kable(diffDeafHear(analysis[['hsRace']]))
 ```
 
-Table: Differences in growth and trends between deaf and hearing
-Americans for each race/ethnicity. Positive Differences indicate faster
-growth for deaf Americans.
+<!-- Table: Differences in growth and trends between deaf and hearing -->
+<!-- Americans for each race/ethnicity. Positive Differences indicate faster -->
+<!-- growth for deaf Americans. -->
 
 
 \newline \newline \newline
@@ -372,23 +372,20 @@ figFun('hsRace',overTime,erbr=FALSE)+ylab('High School Completion')
 figFun('hsRace',overTime,chg=TRUE,erbr=FALSE)+ggtitle('High School Diploma or Equivalent')
 ```
 
-## Attainment
 
-### High School
+<!-- Table: Differences in growth and trends between female deaf and hearing -->
+<!-- Americans for each race/ethicity category. Positive Differences indicate faster -->
+<!-- growth for deaf Americans. -->
 
-Table: Differences in growth and trends between female deaf and hearing
-Americans for each race/ethicity category. Positive Differences indicate faster
-growth for deaf Americans.
-
-#### Deaf Hearing Differences by Race: Male
+<!-- #### Deaf Hearing Differences by Race: Male -->
 \newline \newline \newline
-```{r results='markdown'}
-kable(diffDeafHear(analysis[['hsRaceM']]))
+```{r results='markdown',include=FALSE}
+#kable(diffDeafHear(analysis[['hsRaceM']]))
 ```
 
-Table: Differences in growth and trends between male deaf and hearing
-Americans for each race/ethicity category. Positive Differences indicate faster
-growth for deaf Americans.
+<!-- Table: Differences in growth and trends between male deaf and hearing -->
+<!-- Americans for each race/ethicity category. Positive Differences indicate faster -->
+<!-- growth for deaf Americans. -->
 
 
 
@@ -411,7 +408,6 @@ figFun('hsRaceM',overTime,chg=TRUE,erbr=FALSE)+ylab('High School Completion')+gg
 
 
 
-### By Race/Ethnicity And Gender
 
 #### Deaf Female
 \newline \newline \newline
@@ -452,7 +448,7 @@ High School diploma or equivalent.
 
 
 
-## Associates
+# Associates
 
 \newline \newline \newline
 ```{r CCtotTable,results='markdown'}
@@ -492,13 +488,13 @@ Table: Percentage of hearing Americans by age category attaining a
 Associates diploma or equivalent.
 
 \newline \newline \newline
-```{r CCbyByAgeCatDeafHearDiff,results='markdown'}
-kable(diffDeafHear(analysis[['ccByAgeCat']]))
+```{r CCbyByAgeCatDeafHearDiff,include=FALSE,results='markdown'}
+#kable(diffDeafHear(analysis[['ccByAgeCat']]))
 ```
 
-Table: Differences in growth and trends between deaf and hearing
-Americans for each age category. Positive Differences indicate faster
-growth for deaf Americans.
+<!-- Table: Differences in growth and trends between deaf and hearing -->
+<!-- Americans for each age category. Positive Differences indicate faster -->
+<!-- growth for deaf Americans. -->
 
 
 \newline \newline \newline
@@ -531,14 +527,14 @@ Table: Percentage of hearing Americans by gender attaining a
 Associates diploma or equivalent.
 
 \newline \newline \newline
-```{r CCbySexDeafHearDiff,results='markdown'}
+```{r CCbySexDeafHearDiff,include=FALSE,results='markdown'}
 
-kable(diffDeafHear(analysis[['ccSex']]))
+#kable(diffDeafHear(analysis[['ccSex']]))
 ```
 
-Table: Differences in growth and trends between deaf and hearing
-Americans for males and females. Positive Differences indicate faster
-growth for deaf Americans.
+<!-- Table: Differences in growth and trends between deaf and hearing -->
+<!-- Americans for males and females. Positive Differences indicate faster -->
+<!-- growth for deaf Americans. -->
 
 
 
@@ -573,13 +569,13 @@ Table: Percentage of hearing Americans by race/ethnicity attaining a
 Associates diploma or equivalent.
 
 \newline \newline \newline
-```{r CCbyRaceDeafHearDiff,results='markdown'}
-kable(diffDeafHear(analysis[['ccRace']]))
+```{r CCbyRaceDeafHearDiff,include=FALSE,results='markdown'}
+#kable(diffDeafHear(analysis[['ccRace']]))
 ```
 
-Table: Differences in growth and trends between deaf and hearing
-Americans for each race/ethnicity. Positive Differences indicate faster
-growth for deaf Americans.
+<!-- Table: Differences in growth and trends between deaf and hearing -->
+<!-- Americans for each race/ethnicity. Positive Differences indicate faster -->
+<!-- growth for deaf Americans. -->
 
 
 \newline \newline \newline
@@ -629,25 +625,25 @@ kable(tabFinish(analysis[['ccRaceM']],FALSE))
 Table: Percentage of male hearing Americans by race/ethnicity attaining a
 Associates diploma or equivalent.
 
-#### Deaf Hearing Differences by Race: Female
-\newline \newline \newline
-```{r results='markdown'}
-kable(diffDeafHear(analysis[['ccRaceF']]))
+<!-- #### Deaf Hearing Differences by Race: Female -->
+\newline \newline \newli0ne
+```{r results='markdown',include=FALSE}
+#kable(diffDeafHear(analysis[['ccRaceF']]))
 ```
 
-Table: Differences in growth and trends between female deaf and hearing
-Americans for each race/ethicity category. Positive Differences indicate faster
-growth for deaf Americans.
+<!-- Table: Differences in growth and trends between female deaf and hearing -->
+<!-- Americans for each race/ethicity category. Positive Differences indicate faster -->
+<!-- growth for deaf Americans. -->
 
-#### Deaf Hearing Differences by Race: Male
+<!-- #### Deaf Hearing Differences by Race: Male -->
 \newline \newline \newline
-```{r results='markdown'}
-kable(diffDeafHear(analysis[['ccRaceM']]))
+```{r results='markdown',include=FALSE}
+#kable(diffDeafHear(analysis[['ccRaceM']]))
 ```
 
-Table: Differences in growth and trends between male deaf and hearing
-Americans for each race/ethicity category. Positive Differences indicate faster
-growth for deaf Americans.
+<!-- Table: Differences in growth and trends between male deaf and hearing -->
+<!-- Americans for each race/ethicity category. Positive Differences indicate faster -->
+<!-- growth for deaf Americans. -->
 
 
 
@@ -672,7 +668,7 @@ figFun('ccRaceM',overTime,chg=TRUE,erbr=FALSE)+ylab('Associates Completion')+ggt
 
 
 
-## Bachelors
+# Bachelors
 \newline \newline \newline
 ```{r BAtotTable,results='markdown'}
 kable(tabFinish(analysis[['bachTot']]))
@@ -714,13 +710,13 @@ Table: Percentage of hearing Americans by gender attaining a
 Bachelor's degree.
 
 \newline \newline \newline
-```{r BAbySexDeafHearDiff,results='markdown'}
-kable(diffDeafHear(analysis[['bachSex']]))
+```{r BAbySexDeafHearDiff,include=FALSE,results='markdown'}
+#kable(diffDeafHear(analysis[['bachSex']]))
 ```
 
-Table: Differences in growth and trends between deaf and hearing
-Americans for males and females. Positive Differences indicate faster
-growth for deaf Americans.
+<!-- Table: Differences in growth and trends between deaf and hearing -->
+<!-- Americans for males and females. Positive Differences indicate faster -->
+<!-- growth for deaf Americans. -->
 
 
 \newline \newline \newline
@@ -736,7 +732,7 @@ figFun('bachSex',overTime,chg=TRUE,erbr=FALSE)+ggtitle('Bachelor\'s Degree or Eq
 
 
 
-### Bachelors
+
 \newline \newline \newline
 ```{r BAByAgeCatDeaf,results='markdown'}
 kable(tabFinish(analysis[['bachByAgeCat']],TRUE))
@@ -758,12 +754,12 @@ Bachelor's degree.
 
 \newline \newline \newline
 ```{r BACHByAgeCatHearDiff,results='markdown'}
-kable(diffDeafHear(analysis[['bachByAgeCat']]))
+#kable(diffDeafHear(analysis[['bachByAgeCat']]))
 ```
 
-Table: Differences in growth and trends between deaf and hearing
-Americans for each age category. Positive Differences indicate faster
-growth for deaf Americans.
+<!-- Table: Differences in growth and trends between deaf and hearing -->
+<!-- Americans for each age category. Positive Differences indicate faster -->
+<!-- growth for deaf Americans. -->
 
 
 \newline \newline \newline
@@ -800,12 +796,12 @@ Bachelor's degree.
 
 \newline \newline \newline
 ```{r BACHRaceHearDiff,results='markdown'}
-kable(diffDeafHear(analysis[['bachRace']]))
+#kable(diffDeafHear(analysis[['bachRace']]))
 ```
 
-Table: Differences in growth and trends between deaf and hearing
-Americans for each race/ethnicity. Positive Differences indicate faster
-growth for deaf Americans.
+<!-- Table: Differences in growth and trends between deaf and hearing -->
+<!-- Americans for each race/ethnicity. Positive Differences indicate faster -->
+<!-- growth for deaf Americans. -->
 
 
 \newline \newline \newline
@@ -862,25 +858,25 @@ kable(tabFinish(analysis[['bachRaceM']],FALSE))
 Table: Percentage of male hearing Americans by race/ethnicity attaining a
 Bachelors degree or equivalent.
 
-#### Deaf Hearing Differences by Race: Female
+<!-- #### Deaf Hearing Differences by Race: Female -->
 \newline \newline \newline
 ```{r results='markdown'}
-kable(diffDeafHear(analysis[['bachRaceF']]))
+#kable(diffDeafHear(analysis[['bachRaceF']]))
 ```
 
-Table: Differences in growth and trends between female deaf and hearing
-Americans for each race/ethicity category. Positive Differences indicate faster
-growth for deaf Americans.
+<!-- Table: Differences in growth and trends between female deaf and hearing -->
+<!-- Americans for each race/ethicity category. Positive Differences indicate faster -->
+<!-- growth for deaf Americans. -->
 
-#### Deaf Hearing Differences by Race: Male
+<!-- #### Deaf Hearing Differences by Race: Male -->
 \newline \newline \newline
 ```{r results='markdown'}
-kable(diffDeafHear(analysis[['bachRaceM']]))
+#kable(diffDeafHear(analysis[['bachRaceM']]))
 ```
 
-Table: Differences in growth and trends between male deaf and hearing
-Americans for each race/ethicity category. Positive Differences indicate faster
-growth for deaf Americans.
+<!-- Table: Differences in growth and trends between male deaf and hearing -->
+<!-- Americans for each race/ethicity category. Positive Differences indicate faster -->
+<!-- growth for deaf Americans. -->
 
 
 

@@ -109,9 +109,10 @@ tabFun <- function(nnn,ot,deaf=NULL,moe=TRUE,retEst=TRUE){
                      `Trend (Adj)`=vapply(1:ncol(ests),function(j)
                          trndsAdj[[grep(colnames(ests)[j],names(trnd))]][2]*1,1))
     }
-    if(retEst) return(list(ests=ests,ses=ses))
+  #    if(retEst)
+  return(list(ests=ests,ses=ses))
 
-    tabFinish(ests,ses,moe)
+  #  tabFinish(ests,ses,moe)
 }
 
 tabFinish <- function(anal1,deaf=NULL,moe=TRUE){ #ests,ses,moe,strs){
@@ -146,16 +147,16 @@ tabFinish <- function(anal1,deaf=NULL,moe=TRUE){ #ests,ses,moe,strs){
     tab <- rbind(tab,`Sample Size/year`= format(ss,big.mark=','))
     if(is.null(deaf)){
         colnames(tab) <- c('Deaf','Hearing')
-        tab <- cbind(tab,Difference=
-                           c(
-                             vapply(1:nrow(ests),
-                               function(i)
-                                 diffFun(ests[i,],ses[i,],moe,
-                                   ifelse(rownames(ests)[i]=='Trend (Adj)',diffStars[2],'')),
-                               'a'
-                             ),''
-                           )
-        )
+        ## tab <- cbind(tab,Difference=
+        ##                    c(
+        ##                      vapply(1:nrow(ests),
+        ##                        function(i)
+        ##                          diffFun(ests[i,],ses[i,],moe,
+        ##                            ifelse(rownames(ests)[i]=='Trend (Adj)',diffStars[2],'')),
+        ##                        'a'
+        ##                      ),''
+        ##                    )
+        ## )
     }
 
   ## c(rep('',(nrow(tab)-4)),
@@ -290,14 +291,17 @@ changeFig <- function(nnn,ot,...){
 
 
 
-trends <- function(nnn,ot,intercept=FALSE){
+trends <- function(nnn,ot,weightDat=NULL,intercept=FALSE){
     ccc <- combineDat(nnn,ot)
 
     rows <- if(intercept) c('(Intercept)','year') else 'year'
     trends <- list()
     with(ccc,{
       form <- if('AGEP'%in%names(tdat)) y~year+as.factor(AGEP) else y~year
-      tdat$ww <- if(any(is.na(tdat$se))) tdat$Freq else 1/tdat$se^2
+      if(!is.null(attr(ot,'weightDat'))){
+        tdat <- full_join(tdat,attr(ot,'weightDat'))
+      } else
+        tdat$ww <- if(any(is.na(tdat$se))) tdat$Freq else 1/tdat$se^2
 
 #      if(any(is.na(tdat$y)&!is.na(tdat$se))|any(is.na(tdat$se)&!is.na(tdat$y))) stop('weird na')
 #      tdat$y[is.na(tdat$y)] <- 0
@@ -496,16 +500,18 @@ mult4 <- function(pTrend,pDiff,alpha,adj=TRUE){
 
     ddd <- do.call('rbind',pDiff)
     psd <- if(adj) ddd[,'adj'] else ddd[,'unadj']
-    ps <- c(ps,psd)
+    ## ps <- c(ps,psd)
 
     padj <- c(p.adjust(ps[1:3],method='holm'),
               p.adjust(ps[-c(1:3)],method='fdr'))
-    rej <- padj<alpha
+  rej <- padj<alpha
+  rej <- c(rej,rep(FALSE,length(psd)))
     list(trend=toList(pTrend,rej[1:nTrend]),diff=toList(pDiff,rej[(nTrend+1):length(rej)]))
 }
 
 stars <- function(rej,trend,nn,cc=1){
-    ifelse(rej$`0.001`[[trend]][[nn]][cc],'***',
+  for(rr in rej) if(!is.finite(rr[[trend]][[nn]][cc])) return('')
+  ifelse(rej$`0.001`[[trend]][[nn]][cc],'***',
            ifelse(rej$`0.01`[[trend]][[nn]][cc],'**',
            ifelse(rej$`0.05`[[trend]][[nn]][cc],'*',
                   ifelse(rej$`0.1`[[trend]][[nn]][cc],'.',''))))
@@ -536,12 +542,13 @@ gapDat <- function(nnn,ot){
 
 plotGap <- function(gdat,errbar=TRUE,se=TRUE){
 
-  if(gdat$subCols[2]=='SEX')
-    gdat$gdat <- mutate(gdat$gdat,year=year+ifelse(SEX=='Male',1,-1)*0.1)
-
   p <- if(length(gdat$subCols)==1){
     ggplot(gdat$gdat,aes(year,gap))
-  } else ggplot(gdat$gdat,aes_string("year","gap",color=gdat$subCols[2]))
+  } else{
+    if(gdat$subCols[2]=='SEX')
+      gdat$gdat <- mutate(gdat$gdat,year=year+ifelse(SEX=='Male',1,-1)*0.1)
+    ggplot(gdat$gdat,aes_string("year","gap",color=gdat$subCols[2]))
+  }
 
   p <- p+
     geom_point()+
@@ -664,3 +671,4 @@ makeGapTab <- function(gap1,moe=TRUE){
   }
   tab
 }
+
