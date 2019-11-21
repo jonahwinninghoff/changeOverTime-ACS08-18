@@ -1,6 +1,6 @@
 library(scales)
 library(tidyr)
-
+library(estimatr)
 
 
 combineDat <- function(nnn,ot,deaf=NULL){
@@ -146,11 +146,23 @@ tabFinish <- function(anal1,deaf=NULL,moe=TRUE){ #ests,ses,moe,strs){
     tab <- rbind(tab,`Sample Size/year`= format(ss,big.mark=','))
     if(is.null(deaf)){
         colnames(tab) <- c('Deaf','Hearing')
-        tab <- cbind(tab,Difference=c(rep('',(nrow(tab)-4)),
-                             diffFun(ests['Growth',],ses['Growth',],moe,''),
-                             diffFun(ests['Trend',],ses['Trend',],moe,diffStars[1]),
-                             diffFun(ests['Trend (Adj)',],ses['Trend (Adj)',],moe,diffStars[2]),''))
+        tab <- cbind(tab,Difference=
+                           c(
+                             vapply(1:nrow(ests),
+                               function(i)
+                                 diffFun(ests[i,],ses[i,],moe,
+                                   ifelse(rownames(ests)[i]=='Trend (Adj)',diffStars[2],'')),
+                               'a'
+                             ),''
+                           )
+        )
     }
+
+  ## c(rep('',(nrow(tab)-4)),
+  ##                            diffFun(ests['Growth',],ses['Growth',],moe,''),
+  ##                            diffFun(ests['Trend',],ses['Trend',],moe,diffStars[1]),
+  ##                            diffFun(ests['Trend (Adj)',],ses['Trend (Adj)',],moe,diffStars[2]),''))
+  ##   }
 
     tab
 }
@@ -219,6 +231,8 @@ figFun <- function(nnn,ot,chg=FALSE,erbr=FALSE,...){
         theme(axis.text.x = element_text(angle = 90, hjust = 1,vjust=0.5))
 }
 
+
+
     ## errbar(2008:2016,estsD[,1],estsD[,1]+2*sesD[,1],estsD[,1]-2*sesD[,1],
 ##            ylim=c(0,1),type='l')#,...)
 ##     lines(2008:2016,estsH[,1],lty=3)
@@ -276,25 +290,30 @@ changeFig <- function(nnn,ot,...){
 
 
 
-trends <- function(nnn,ot){
+trends <- function(nnn,ot,intercept=FALSE){
     ccc <- combineDat(nnn,ot)
 
+    rows <- if(intercept) c('(Intercept)','year') else 'year'
     trends <- list()
     with(ccc,{
-             form <- if('AGEP'%in%names(tdat)) y~year+as.factor(AGEP) else y~year
-             for(i in 1:nrow(subsets)){
-                 keep <- rep(TRUE,nrow(tdat))
-                 for(j in 1:ncol(subsets)){
-                     if(is.factor(subsets[,j])) subsets[,j] <- as.character(subsets[,j])
-                     keep <- keep&(tdat[,subCols[j]]==subsets[i,j])
-                 }
-                 trends[[paste(subCols,subsets[i,],collapse=' ',sep='=')]] <-
-                     summary(lm(form,data=tdat[keep,],weights=Freq))$coef['year',]
-             }
-             trends
-         })
-}
+      form <- if('AGEP'%in%names(tdat)) y~year+as.factor(AGEP) else y~year
+      tdat$ww <- if(any(is.na(tdat$se))) tdat$Freq else 1/tdat$se^2
 
+#      if(any(is.na(tdat$y)&!is.na(tdat$se))|any(is.na(tdat$se)&!is.na(tdat$y))) stop('weird na')
+#      tdat$y[is.na(tdat$y)] <- 0
+
+      for(i in 1:nrow(subsets)){
+        keep <- rep(TRUE,nrow(tdat))
+        for(j in 1:ncol(subsets)){
+          if(is.factor(subsets[,j])) subsets[,j] <- as.character(subsets[,j])
+          keep <- keep&(tdat[,subCols[j]]==subsets[i,j])
+        }
+        trends[[paste(subCols,subsets[i,],collapse=' ',sep='=')]] <-
+          summary(lm_robust(form,data=tdat[keep,],weights=ww))$coef[rows,]
+      }
+      trends
+    })
+}
 
 
 trendsFull <- function(ot){
@@ -373,7 +392,15 @@ diffSub <- function(ests,ses,varb,moe=TRUE){
 
 
 toList <- function(lst,vec){
-    fac <- factor(do.call('c',lapply(names(lst),function(nm) if(is.matrix(lst[[nm]])) rep(nm,nrow(lst[[nm]])) else nm)))
+  fac <- factor(
+    do.call(
+      'c',
+      lapply(
+        names(lst),
+        function(nm) if(is.matrix(lst[[nm]])) rep(nm,nrow(lst[[nm]])) else nm
+      )
+    )
+  )
     split(vec,fac)
 }
 
@@ -490,4 +517,150 @@ getSampleSizes <- function(nnn,ot,deaf){
     out <- with(ccc,sapply(unique(tdat[[subCols[1]]]), function(x) round(mean(tdat$Freq[tdat[[subCols[1]]]==x]))))
     if(is.null(names(out))) names(out) <- with(ccc,unique(tdat[[subCols[1]]]))
     out
+}
+
+
+
+#### functions for plotting gaps over time
+gapDat <- function(nnn,ot){
+  ccc <- combineDat(nnn,ot)
+
+  gdat <- ccc$tdat%>%
+    select(-Freq)%>%
+    group_by_at(vars(-DEAR,-y,-se))%>%
+    summarize(gap=y[DEAR==2]-y[DEAR==1],se=sqrt(se[DEAR==1]^2+se[DEAR==2]^2))%>%
+    mutate(year=year+2007)
+
+  list(gdat=gdat,subCols=ccc$subCols,subsets=ccc$subsets)
+}
+
+plotGap <- function(gdat,errbar=TRUE,se=TRUE){
+
+  if(gdat$subCols[2]=='SEX')
+    gdat$gdat <- mutate(gdat$gdat,year=year+ifelse(SEX=='Male',1,-1)*0.1)
+
+  p <- if(length(gdat$subCols)==1){
+    ggplot(gdat$gdat,aes(year,gap))
+  } else ggplot(gdat$gdat,aes_string("year","gap",color=gdat$subCols[2]))
+
+  p <- p+
+    geom_point()+
+    geom_smooth(method='lm',se=se)+
+    scale_x_continuous('Year',breaks=2008:2018,minor_breaks=NULL)+
+    ylab('Hearing-Deaf Gap (Percentage Points)')
+
+  if(length(gdat$subCols)>1) p <- p+scale_color_manual(name=NULL,values=subwayPalette)
+
+  if(errbar) p <- p+geom_errorbar(aes(ymin=gap-2*se,ymax=gap+2*se),width=0)
+
+  p
+}
+
+gapAdjOne <- function(tab,...){
+  names(tab)[grep('edLev',names(tab))] <- 'y'
+  mod <- lm_robust(y~DEAR+as.factor(AGEP),data=tab,subset=!is.na(y)&!is.na(se))
+  as.data.frame(summary(mod)$coef)['DEAR',1:2]
+}
+
+gapAdj <- function(dat){
+  names(dat)[grep('edLev',names(dat))] <- 'y'
+  subCols <- setdiff(names(dat),c('y','AGEP','se','Freq','se1','se2','year','DEAR'))
+
+  if('SEX'%in%names(dat)) dat$SEX <- c('Male','Female')[dat$SEX]
+
+
+  if(!length(subCols))
+    return(gapAdjOne(dat))
+
+  dat%>%
+    group_by_at(vars(!! sym(subCols)))%>%
+    group_map(gapAdjOne)%>%
+    mutate(year=dat$year[1])
+}
+
+gapTrendOne <- function(tdat,...){
+  mod <-
+    if(any(is.na(tdat$se))){
+      lm_robust(y~(DEAR+splines::ns(AGEP,5))*year,tdat,weights=ww)
+    } else
+      lm_robust(y~(DEAR+as.factor(AGEP))*year,weights=ww,data=tdat)
+
+  as.data.frame(summary(mod)$coef)['DEAR:year',c(1,2,4)]
+}
+
+gapTrend <- function(nnn,overTimeAge,weightDat,...){
+  ccc <- combineDat(nnn,overTimeAge)
+  tdat <- ccc$tdat
+  if(!is.null(weightDat)){
+    tdat <- full_join(tdat,weightDat)
+  } else
+    tdat$ww <- if(any(is.na(tdat$se))) tdat$Freq else 1/tdat$se^2
+
+  if(length(ccc$subCols)==1) return(gapTrendOne(tdat))
+
+  tdat%>%
+    group_by_at(vars(!! sym(ccc$subCols[2])))%>%
+    group_map(gapTrendOne)
+}
+
+gapAdjYr <- function(nnn,overTimeAge,weightDat=NULL){
+  gaps <- lapply(overTimeAge, function(ota) gapAdj(ota[[nnn]]))
+
+  ests <- do.call('rbind',lapply(gaps,function(x) x$Estimate))
+  ses <- do.call('rbind',lapply(gaps,function(x) x$`Std. Error`))
+  rownames(ests) <- rownames(ses) <- 2007+seq(length(gaps))
+  if(ncol(ests)>1) colnames(ests) <- colnames(ses) <- gaps[[1]][[1]]
+
+
+
+  gtrends <- gapTrend(nnn,overTimeAge,weightDat=weightDat)
+  ests <- rbind(ests,trend=gtrends$Estimate)
+  ses <- rbind(ses,trend=gtrends$`Std. Error`)
+  trendPs <- gtrends$`Pr(>|t|)`
+  if(ncol(ests)>1) names(trendPs) <- unlist(gtrends[,1])
+
+  list(ests=ests,ses=ses,pvals=trendPs)
+}
+
+gapDatAdj <- function(nnn,overTimeAge){
+  gay <- gapAdjYr(nnn,overTimeAge)
+  ccc <- combineDat(nnn,overTimeAge)
+  if(ncol(gay$ests)==1)
+    return(
+      list(
+        gdat=data.frame(year=seq(nrow(gay$est)-1)+2007,gap=gay$ests[-nrow(gay$ests)],se=gay$se[-nrow(gay$ests)]),
+        subCols=ccc$subCols,
+        subsets=ccc$subsets
+      )
+    )
+
+  gdat <- distinct(ccc$tdat[,c(ccc$subCols[2],'year')])
+  gdat$year <- gdat$year+2007
+  gdat$gap <- gdat$se <- NA
+  for(i in 1:nrow(gdat)){
+    gdat$gap[i] <- gay$ests[as.character(gdat$year[i]),gdat[[ccc$subCols[2]]][i]]
+    gdat$se[i] <- gay$ses[as.character(gdat$year[i]),gdat[[ccc$subCols[2]]][i]]
+  }
+
+  list(
+    gdat=gdat,
+    subCols=ccc$subCols,
+    subsets=ccc$subsets
+  )
+}
+
+makeGapTab <- function(gap1,moe=TRUE){
+  ests <- gap1$ests
+  ses <- gap1$ses
+  strs <- cbind(gap1$stars,c('',''))
+
+  tab <- ests
+  for(j in 1:ncol(ests)){
+    for(i in 1:nrow(ests)){
+      if(moe) tab[i,j] <- paste(round(ests[i,j],1),'$\\pm$',round(ses[i,j]*1.96,1))
+      else tab[i,j] <- paste0(round(ests[i,j],1),' (',round(ses[i,j],1),')')
+    }
+    tab['trend',j] <- paste0(tab['trend',j],strs[j])
+  }
+  tab
 }

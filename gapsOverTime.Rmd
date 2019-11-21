@@ -1,0 +1,1015 @@
+---
+title: "Trends in Educational Attainment Gaps"
+date: '`r format(Sys.Date(), "%B %d, %Y")`'
+output: word_document
+---
+
+
+```{r prelim,include=FALSE,cache=FALSE}
+library(knitr)
+library(tidyverse)
+library(rmarkdown)
+
+opts_chunk$set(
+echo=FALSE,results='hide',warning = FALSE,message = FALSE,error=FALSE,cache=FALSE
+)
+
+```
+
+```{r sourceCode,include=FALSE}
+ya <- FALSE
+source('trends.r')
+```
+
+```{r loadEsts,include=FALSE}
+load('output/estByYear.RData')
+
+for(i in 1:length(overTime)){
+    for(j in 1:length(overTime[[i]])){
+        overTime[[i]][[j]]$year <- i
+    }
+    for(j in 1:length(overTimeAge[[i]])){
+        overTimeAge[[i]][[j]]$year <- i
+    }
+    for(lev in c('hs','cc','bach'))
+        for(sex in 1:2){
+            overTime[[i]][[paste0(lev,'Race',c('M','F')[sex])]] <-
+                subset(overTime[[i]][[paste0(lev,'RaceSex')]],SEX==sex,select=-SEX)
+            overTimeAge[[i]][[paste0(lev,'Race',c('M','F')[sex])]] <-
+                subset(overTimeAge[[i]][[paste0(lev,'RaceSex')]],SEX==sex,select=-SEX)
+        }
+    if(!ya){
+        overTime[[i]]$hs25.29 <- overTime[[i]]$hs25.29[-grep('FALSE',rownames(overTime[[i]]$hs25.29)),]
+        overTime[[i]]$bach25.29 <- overTime[[i]]$bach25.29[-grep('FALSE',rownames(overTime[[i]]$bach25.29)),]
+        overTime[[i]]$hs25.29[['I(AGEP < 30)']] <- overTime[[i]]$bach25.29[['I(AGEP < 30)']] <- NULL
+    }
+}
+
+for(i in 1:length(overTime))
+  for(j in 1:length(overTime[[i]]))
+    names(overTime[[i]][[j]]) <- gsub('se2','se',names(overTime[[i]][[j]]))
+
+for(i in 1:length(overTimeAge))
+  for(j in 1:length(overTimeAge[[i]]))
+    names(overTimeAge[[i]][[j]]) <- gsub('se2','se',names(overTimeAge[[i]][[j]]))
+
+
+```
+
+```{r ageDist,include=FALSE,eval=FALSE}
+
+datA <- read_csv('../../data/byYear/ss18pusa.csv',col_types=cols(AGEP='i',PWGTP='i',.default='_'))
+datB <- read_csv('../../data/byYear/ss18pusb.csv',col_types=cols(AGEP='i',PWGTP='i',.default='_'))
+dat18 <- bind_rows(datA,datB)%>%
+  filter(AGEP<65,AGEP>24)%>%
+  mutate(w=PWGTP/sum(PWGTP))
+ageDist18 <- dat18%>%group_by(AGEP)%>%summarize(ww=sum(w))
+save(ageDist18,file='output/ageDist18.RData')
+```
+
+```{r loadAgeDist,include=FALSE}
+load('output/ageDist18.RData')
+```
+
+```{r estimateTrends,include=FALSE}
+subs <- c('Tot','25.29',
+          'ByAgeCat',
+          'Sex','Race','RaceM','RaceF')#,'RaceSex')
+
+gaps <- list()
+for(s in subs)
+    for(l in c('hs','cc','bach')){
+        nn <- paste0(l,s)
+        gaps[[nn]] <- gapAdjYr(nn,overTimeAge,ageDist18)
+        #gaps[[nn]]$SS <- getSampleSizes(nn,overTime,NULL)
+}
+
+pvals <- do.call('c',lapply(gaps,function(x) x$pvals))
+pvalsAdj <- c(p.adjust(pvals[1:3],'holm'),p.adjust(pvals[-c(1:3)],method='fdr'))
+
+stars <-
+  ifelse(pvalsAdj<0.001,'***',
+    ifelse(pvalsAdj<0.01,'**',
+      ifelse(pvalsAdj<0.05,'*',
+          ifelse(pvalsAdj<0.1,'.',''))))
+
+
+for(nn in names(gaps)){
+  gaps[[nn]]$stars <-
+    if(ncol(gaps[[nn]]$ests)==1) stars[nn] else stars[paste0(nn,'.',colnames(gaps[[nn]]$ests))]
+}
+```
+
+```{r totalgaps, results='markdown'}
+totGap <- list(
+  gdat=bind_rows(
+    cbind(gapDatAdj('hsTot',overTimeAge)$gdat,level='High School'),
+    cbind(gapDatAdj('ccTot',overTimeAge)$gdat,level="Associate's Degree"),
+    cbind(gapDatAdj('bachTot',overTimeAge)$gdat,level="Bachelor's Degree")
+  ),
+  subCols=c('DEAR','level')
+)
+p <- plotGap(totGap)+ggtitle('Attainment Gaps Over Time')
+ggsave('figure/gapFigs/totGapsAdj.png',p)
+
+```
+
+```{r}
+l <- 'hs'
+ss <- 'Tot'
+   gdat <- gapDatAdj(paste0(l,ss),overTimeAge)
+    plotGap(gdat,errbar=nrow(gdat$subsets)/2<4)+
+      ggtitle(
+        paste(
+          switch(l,
+            hs='High School',
+            cc="Associate's Degree",
+            bach="Bachelor's Degree"
+          ),
+          'Attainment Gaps Over Time (Age-Adjusted)'
+      ),
+      subtitle=if(ss=='Tot') NULL else
+        switch(ss,
+          ByAgeCat='By Age',
+          Sex='By Sex',
+          Race='By Race/Ethnicity',
+          RaceM='By Race/Ethnicity (Males)',
+          RaceF='By Race/Ethnicity (Females)'
+        )
+      )
+    ggsave(paste0('figure/gapFigs/',l,ss,'GapAgeAdjusted.png'))
+```
+
+```{r, results='markdown'}
+l <- 'hs'
+ss <- 'Tot'
+   kable(makeGapTab(gaps[[paste0(l,ss)]]),
+      caption=paste(
+        'Age-adjusted hearing-deaf gaps in',
+        switch(l,
+          hs='High School',
+          cc="Associate's Degree",
+          bach="Bachelor's Degree"
+        ),
+        'Attainment over time',
+        switch(ss,
+          Tot='',
+          ByAgeCat='stratified by Age',
+          Sex='stratified by Sex',
+          Race='stratified by Race/Ethnicity',
+          RaceM='stratified by Race/Ethnicity (Males)',
+          RaceF='stratified by Race/Ethnicity (Females)'
+          )
+      )
+    )
+```
+
+```{r}
+l <- 'cc'
+ss <- 'Tot'
+   gdat <- gapDatAdj(paste0(l,ss),overTimeAge)
+    plotGap(gdat,errbar=nrow(gdat$subsets)/2<4)+
+      ggtitle(
+        paste(
+          switch(l,
+            hs='High School',
+            cc="Associate's Degree",
+            bach="Bachelor's Degree"
+          ),
+          'Attainment Gaps Over Time (Age-Adjusted)'
+      ),
+      subtitle=if(ss=='Tot') NULL else
+        switch(ss,
+          ByAgeCat='By Age',
+          Sex='By Sex',
+          Race='By Race/Ethnicity',
+          RaceM='By Race/Ethnicity (Males)',
+          RaceF='By Race/Ethnicity (Females)'
+        )
+      )
+    ggsave(paste0('figure/gapFigs/',l,ss,'GapAgeAdjusted.png'))
+```
+
+```{r, results='markdown'}
+l <- 'cc'
+ss <- 'Tot'
+   kable(makeGapTab(gaps[[paste0(l,ss)]]),
+      caption=paste(
+        'Age-adjusted hearing-deaf gaps in',
+        switch(l,
+          hs='High School',
+          cc="Associate's Degree",
+          bach="Bachelor's Degree"
+        ),
+        'Attainment over time',
+        switch(ss,
+          Tot='',
+          ByAgeCat='stratified by Age',
+          Sex='stratified by Sex',
+          Race='stratified by Race/Ethnicity',
+          RaceM='stratified by Race/Ethnicity (Males)',
+          RaceF='stratified by Race/Ethnicity (Females)'
+          )
+      )
+    )
+```
+
+```{r}
+l <- 'bach'
+ss <- 'Tot'
+   gdat <- gapDatAdj(paste0(l,ss),overTimeAge)
+    plotGap(gdat,errbar=nrow(gdat$subsets)/2<4)+
+      ggtitle(
+        paste(
+          switch(l,
+            hs='High School',
+            cc="Associate's Degree",
+            bach="Bachelor's Degree"
+          ),
+          'Attainment Gaps Over Time (Age-Adjusted)'
+      ),
+      subtitle=if(ss=='Tot') NULL else
+        switch(ss,
+          ByAgeCat='By Age',
+          Sex='By Sex',
+          Race='By Race/Ethnicity',
+          RaceM='By Race/Ethnicity (Males)',
+          RaceF='By Race/Ethnicity (Females)'
+        )
+      )
+    ggsave(paste0('figure/gapFigs/',l,ss,'GapAgeAdjusted.png'))
+```
+
+```{r, results='markdown'}
+l <- 'bach'
+ss <- 'Tot'
+   kable(makeGapTab(gaps[[paste0(l,ss)]]),
+      caption=paste(
+        'Age-adjusted hearing-deaf gaps in',
+        switch(l,
+          hs='High School',
+          cc="Associate's Degree",
+          bach="Bachelor's Degree"
+        ),
+        'Attainment over time',
+        switch(ss,
+          Tot='',
+          ByAgeCat='stratified by Age',
+          Sex='stratified by Sex',
+          Race='stratified by Race/Ethnicity',
+          RaceM='stratified by Race/Ethnicity (Males)',
+          RaceF='stratified by Race/Ethnicity (Females)'
+          )
+      )
+    )
+```
+
+```{r}
+l <- 'hs'
+ss <- 'ByAgeCat'
+   gdat <- gapDatAdj(paste0(l,ss),overTimeAge)
+    plotGap(gdat,errbar=nrow(gdat$subsets)/2<4)+
+      ggtitle(
+        paste(
+          switch(l,
+            hs='High School',
+            cc="Associate's Degree",
+            bach="Bachelor's Degree"
+          ),
+          'Attainment Gaps Over Time (Age-Adjusted)'
+      ),
+      subtitle=if(ss=='Tot') NULL else
+        switch(ss,
+          ByAgeCat='By Age',
+          Sex='By Sex',
+          Race='By Race/Ethnicity',
+          RaceM='By Race/Ethnicity (Males)',
+          RaceF='By Race/Ethnicity (Females)'
+        )
+      )
+    ggsave(paste0('figure/gapFigs/',l,ss,'GapAgeAdjusted.png'))
+```
+
+```{r, results='markdown'}
+l <- 'hs'
+ss <- 'ByAgeCat'
+   kable(makeGapTab(gaps[[paste0(l,ss)]]),
+      caption=paste(
+        'Age-adjusted hearing-deaf gaps in',
+        switch(l,
+          hs='High School',
+          cc="Associate's Degree",
+          bach="Bachelor's Degree"
+        ),
+        'Attainment over time',
+        switch(ss,
+          Tot='',
+          ByAgeCat='stratified by Age',
+          Sex='stratified by Sex',
+          Race='stratified by Race/Ethnicity',
+          RaceM='stratified by Race/Ethnicity (Males)',
+          RaceF='stratified by Race/Ethnicity (Females)'
+          )
+      )
+    )
+```
+
+```{r}
+l <- 'cc'
+ss <- 'ByAgeCat'
+   gdat <- gapDatAdj(paste0(l,ss),overTimeAge)
+    plotGap(gdat,errbar=nrow(gdat$subsets)/2<4)+
+      ggtitle(
+        paste(
+          switch(l,
+            hs='High School',
+            cc="Associate's Degree",
+            bach="Bachelor's Degree"
+          ),
+          'Attainment Gaps Over Time (Age-Adjusted)'
+      ),
+      subtitle=if(ss=='Tot') NULL else
+        switch(ss,
+          ByAgeCat='By Age',
+          Sex='By Sex',
+          Race='By Race/Ethnicity',
+          RaceM='By Race/Ethnicity (Males)',
+          RaceF='By Race/Ethnicity (Females)'
+        )
+      )
+    ggsave(paste0('figure/gapFigs/',l,ss,'GapAgeAdjusted.png'))
+```
+
+```{r, results='markdown'}
+l <- 'cc'
+ss <- 'ByAgeCat'
+   kable(makeGapTab(gaps[[paste0(l,ss)]]),
+      caption=paste(
+        'Age-adjusted hearing-deaf gaps in',
+        switch(l,
+          hs='High School',
+          cc="Associate's Degree",
+          bach="Bachelor's Degree"
+        ),
+        'Attainment over time',
+        switch(ss,
+          Tot='',
+          ByAgeCat='stratified by Age',
+          Sex='stratified by Sex',
+          Race='stratified by Race/Ethnicity',
+          RaceM='stratified by Race/Ethnicity (Males)',
+          RaceF='stratified by Race/Ethnicity (Females)'
+          )
+      )
+    )
+```
+
+```{r}
+l <- 'bach'
+ss <- 'ByAgeCat'
+   gdat <- gapDatAdj(paste0(l,ss),overTimeAge)
+    plotGap(gdat,errbar=nrow(gdat$subsets)/2<4)+
+      ggtitle(
+        paste(
+          switch(l,
+            hs='High School',
+            cc="Associate's Degree",
+            bach="Bachelor's Degree"
+          ),
+          'Attainment Gaps Over Time (Age-Adjusted)'
+      ),
+      subtitle=if(ss=='Tot') NULL else
+        switch(ss,
+          ByAgeCat='By Age',
+          Sex='By Sex',
+          Race='By Race/Ethnicity',
+          RaceM='By Race/Ethnicity (Males)',
+          RaceF='By Race/Ethnicity (Females)'
+        )
+      )
+    ggsave(paste0('figure/gapFigs/',l,ss,'GapAgeAdjusted.png'))
+```
+
+```{r, results='markdown'}
+l <- 'bach'
+ss <- 'ByAgeCat'
+   kable(makeGapTab(gaps[[paste0(l,ss)]]),
+      caption=paste(
+        'Age-adjusted hearing-deaf gaps in',
+        switch(l,
+          hs='High School',
+          cc="Associate's Degree",
+          bach="Bachelor's Degree"
+        ),
+        'Attainment over time',
+        switch(ss,
+          Tot='',
+          ByAgeCat='stratified by Age',
+          Sex='stratified by Sex',
+          Race='stratified by Race/Ethnicity',
+          RaceM='stratified by Race/Ethnicity (Males)',
+          RaceF='stratified by Race/Ethnicity (Females)'
+          )
+      )
+    )
+```
+
+```{r}
+l <- 'hs'
+ss <- 'Sex'
+   gdat <- gapDatAdj(paste0(l,ss),overTimeAge)
+    plotGap(gdat,errbar=nrow(gdat$subsets)/2<4)+
+      ggtitle(
+        paste(
+          switch(l,
+            hs='High School',
+            cc="Associate's Degree",
+            bach="Bachelor's Degree"
+          ),
+          'Attainment Gaps Over Time (Age-Adjusted)'
+      ),
+      subtitle=if(ss=='Tot') NULL else
+        switch(ss,
+          ByAgeCat='By Age',
+          Sex='By Sex',
+          Race='By Race/Ethnicity',
+          RaceM='By Race/Ethnicity (Males)',
+          RaceF='By Race/Ethnicity (Females)'
+        )
+      )
+    ggsave(paste0('figure/gapFigs/',l,ss,'GapAgeAdjusted.png'))
+```
+
+```{r, results='markdown'}
+l <- 'hs'
+ss <- 'Sex'
+   kable(makeGapTab(gaps[[paste0(l,ss)]]),
+      caption=paste(
+        'Age-adjusted hearing-deaf gaps in',
+        switch(l,
+          hs='High School',
+          cc="Associate's Degree",
+          bach="Bachelor's Degree"
+        ),
+        'Attainment over time',
+        switch(ss,
+          Tot='',
+          ByAgeCat='stratified by Age',
+          Sex='stratified by Sex',
+          Race='stratified by Race/Ethnicity',
+          RaceM='stratified by Race/Ethnicity (Males)',
+          RaceF='stratified by Race/Ethnicity (Females)'
+          )
+      )
+    )
+```
+
+```{r}
+l <- 'cc'
+ss <- 'Sex'
+   gdat <- gapDatAdj(paste0(l,ss),overTimeAge)
+    plotGap(gdat,errbar=nrow(gdat$subsets)/2<4)+
+      ggtitle(
+        paste(
+          switch(l,
+            hs='High School',
+            cc="Associate's Degree",
+            bach="Bachelor's Degree"
+          ),
+          'Attainment Gaps Over Time (Age-Adjusted)'
+      ),
+      subtitle=if(ss=='Tot') NULL else
+        switch(ss,
+          ByAgeCat='By Age',
+          Sex='By Sex',
+          Race='By Race/Ethnicity',
+          RaceM='By Race/Ethnicity (Males)',
+          RaceF='By Race/Ethnicity (Females)'
+        )
+      )
+    ggsave(paste0('figure/gapFigs/',l,ss,'GapAgeAdjusted.png'))
+```
+
+```{r, results='markdown'}
+l <- 'cc'
+ss <- 'Sex'
+   kable(makeGapTab(gaps[[paste0(l,ss)]]),
+      caption=paste(
+        'Age-adjusted hearing-deaf gaps in',
+        switch(l,
+          hs='High School',
+          cc="Associate's Degree",
+          bach="Bachelor's Degree"
+        ),
+        'Attainment over time',
+        switch(ss,
+          Tot='',
+          ByAgeCat='stratified by Age',
+          Sex='stratified by Sex',
+          Race='stratified by Race/Ethnicity',
+          RaceM='stratified by Race/Ethnicity (Males)',
+          RaceF='stratified by Race/Ethnicity (Females)'
+          )
+      )
+    )
+```
+
+```{r}
+l <- 'bach'
+ss <- 'Sex'
+   gdat <- gapDatAdj(paste0(l,ss),overTimeAge)
+    plotGap(gdat,errbar=nrow(gdat$subsets)/2<4)+
+      ggtitle(
+        paste(
+          switch(l,
+            hs='High School',
+            cc="Associate's Degree",
+            bach="Bachelor's Degree"
+          ),
+          'Attainment Gaps Over Time (Age-Adjusted)'
+      ),
+      subtitle=if(ss=='Tot') NULL else
+        switch(ss,
+          ByAgeCat='By Age',
+          Sex='By Sex',
+          Race='By Race/Ethnicity',
+          RaceM='By Race/Ethnicity (Males)',
+          RaceF='By Race/Ethnicity (Females)'
+        )
+      )
+    ggsave(paste0('figure/gapFigs/',l,ss,'GapAgeAdjusted.png'))
+```
+
+```{r, results='markdown'}
+l <- 'bach'
+ss <- 'Sex'
+   kable(makeGapTab(gaps[[paste0(l,ss)]]),
+      caption=paste(
+        'Age-adjusted hearing-deaf gaps in',
+        switch(l,
+          hs='High School',
+          cc="Associate's Degree",
+          bach="Bachelor's Degree"
+        ),
+        'Attainment over time',
+        switch(ss,
+          Tot='',
+          ByAgeCat='stratified by Age',
+          Sex='stratified by Sex',
+          Race='stratified by Race/Ethnicity',
+          RaceM='stratified by Race/Ethnicity (Males)',
+          RaceF='stratified by Race/Ethnicity (Females)'
+          )
+      )
+    )
+```
+
+```{r}
+l <- 'hs'
+ss <- 'Race'
+   gdat <- gapDatAdj(paste0(l,ss),overTimeAge)
+    plotGap(gdat,errbar=nrow(gdat$subsets)/2<4)+
+      ggtitle(
+        paste(
+          switch(l,
+            hs='High School',
+            cc="Associate's Degree",
+            bach="Bachelor's Degree"
+          ),
+          'Attainment Gaps Over Time (Age-Adjusted)'
+      ),
+      subtitle=if(ss=='Tot') NULL else
+        switch(ss,
+          ByAgeCat='By Age',
+          Sex='By Sex',
+          Race='By Race/Ethnicity',
+          RaceM='By Race/Ethnicity (Males)',
+          RaceF='By Race/Ethnicity (Females)'
+        )
+      )
+    ggsave(paste0('figure/gapFigs/',l,ss,'GapAgeAdjusted.png'))
+```
+
+```{r, results='markdown'}
+l <- 'hs'
+ss <- 'Race'
+   kable(makeGapTab(gaps[[paste0(l,ss)]]),
+      caption=paste(
+        'Age-adjusted hearing-deaf gaps in',
+        switch(l,
+          hs='High School',
+          cc="Associate's Degree",
+          bach="Bachelor's Degree"
+        ),
+        'Attainment over time',
+        switch(ss,
+          Tot='',
+          ByAgeCat='stratified by Age',
+          Sex='stratified by Sex',
+          Race='stratified by Race/Ethnicity',
+          RaceM='stratified by Race/Ethnicity (Males)',
+          RaceF='stratified by Race/Ethnicity (Females)'
+          )
+      )
+    )
+```
+
+```{r}
+l <- 'cc'
+ss <- 'Race'
+   gdat <- gapDatAdj(paste0(l,ss),overTimeAge)
+    plotGap(gdat,errbar=nrow(gdat$subsets)/2<4)+
+      ggtitle(
+        paste(
+          switch(l,
+            hs='High School',
+            cc="Associate's Degree",
+            bach="Bachelor's Degree"
+          ),
+          'Attainment Gaps Over Time (Age-Adjusted)'
+      ),
+      subtitle=if(ss=='Tot') NULL else
+        switch(ss,
+          ByAgeCat='By Age',
+          Sex='By Sex',
+          Race='By Race/Ethnicity',
+          RaceM='By Race/Ethnicity (Males)',
+          RaceF='By Race/Ethnicity (Females)'
+        )
+      )
+    ggsave(paste0('figure/gapFigs/',l,ss,'GapAgeAdjusted.png'))
+```
+
+```{r, results='markdown'}
+l <- 'cc'
+ss <- 'Race'
+   kable(makeGapTab(gaps[[paste0(l,ss)]]),
+      caption=paste(
+        'Age-adjusted hearing-deaf gaps in',
+        switch(l,
+          hs='High School',
+          cc="Associate's Degree",
+          bach="Bachelor's Degree"
+        ),
+        'Attainment over time',
+        switch(ss,
+          Tot='',
+          ByAgeCat='stratified by Age',
+          Sex='stratified by Sex',
+          Race='stratified by Race/Ethnicity',
+          RaceM='stratified by Race/Ethnicity (Males)',
+          RaceF='stratified by Race/Ethnicity (Females)'
+          )
+      )
+    )
+```
+
+```{r}
+l <- 'bach'
+ss <- 'Race'
+   gdat <- gapDatAdj(paste0(l,ss),overTimeAge)
+    plotGap(gdat,errbar=nrow(gdat$subsets)/2<4)+
+      ggtitle(
+        paste(
+          switch(l,
+            hs='High School',
+            cc="Associate's Degree",
+            bach="Bachelor's Degree"
+          ),
+          'Attainment Gaps Over Time (Age-Adjusted)'
+      ),
+      subtitle=if(ss=='Tot') NULL else
+        switch(ss,
+          ByAgeCat='By Age',
+          Sex='By Sex',
+          Race='By Race/Ethnicity',
+          RaceM='By Race/Ethnicity (Males)',
+          RaceF='By Race/Ethnicity (Females)'
+        )
+      )
+    ggsave(paste0('figure/gapFigs/',l,ss,'GapAgeAdjusted.png'))
+```
+
+```{r, results='markdown'}
+l <- 'bach'
+ss <- 'Race'
+   kable(makeGapTab(gaps[[paste0(l,ss)]]),
+      caption=paste(
+        'Age-adjusted hearing-deaf gaps in',
+        switch(l,
+          hs='High School',
+          cc="Associate's Degree",
+          bach="Bachelor's Degree"
+        ),
+        'Attainment over time',
+        switch(ss,
+          Tot='',
+          ByAgeCat='stratified by Age',
+          Sex='stratified by Sex',
+          Race='stratified by Race/Ethnicity',
+          RaceM='stratified by Race/Ethnicity (Males)',
+          RaceF='stratified by Race/Ethnicity (Females)'
+          )
+      )
+    )
+```
+
+```{r}
+l <- 'hs'
+ss <- 'RaceM'
+   gdat <- gapDatAdj(paste0(l,ss),overTimeAge)
+    plotGap(gdat,errbar=nrow(gdat$subsets)/2<4)+
+      ggtitle(
+        paste(
+          switch(l,
+            hs='High School',
+            cc="Associate's Degree",
+            bach="Bachelor's Degree"
+          ),
+          'Attainment Gaps Over Time (Age-Adjusted)'
+      ),
+      subtitle=if(ss=='Tot') NULL else
+        switch(ss,
+          ByAgeCat='By Age',
+          Sex='By Sex',
+          Race='By Race/Ethnicity',
+          RaceM='By Race/Ethnicity (Males)',
+          RaceF='By Race/Ethnicity (Females)'
+        )
+      )
+    ggsave(paste0('figure/gapFigs/',l,ss,'GapAgeAdjusted.png'))
+```
+
+```{r, results='markdown'}
+l <- 'hs'
+ss <- 'RaceM'
+   kable(makeGapTab(gaps[[paste0(l,ss)]]),
+      caption=paste(
+        'Age-adjusted hearing-deaf gaps in',
+        switch(l,
+          hs='High School',
+          cc="Associate's Degree",
+          bach="Bachelor's Degree"
+        ),
+        'Attainment over time',
+        switch(ss,
+          Tot='',
+          ByAgeCat='stratified by Age',
+          Sex='stratified by Sex',
+          Race='stratified by Race/Ethnicity',
+          RaceM='stratified by Race/Ethnicity (Males)',
+          RaceF='stratified by Race/Ethnicity (Females)'
+          )
+      )
+    )
+```
+
+```{r}
+l <- 'cc'
+ss <- 'RaceM'
+   gdat <- gapDatAdj(paste0(l,ss),overTimeAge)
+    plotGap(gdat,errbar=nrow(gdat$subsets)/2<4)+
+      ggtitle(
+        paste(
+          switch(l,
+            hs='High School',
+            cc="Associate's Degree",
+            bach="Bachelor's Degree"
+          ),
+          'Attainment Gaps Over Time (Age-Adjusted)'
+      ),
+      subtitle=if(ss=='Tot') NULL else
+        switch(ss,
+          ByAgeCat='By Age',
+          Sex='By Sex',
+          Race='By Race/Ethnicity',
+          RaceM='By Race/Ethnicity (Males)',
+          RaceF='By Race/Ethnicity (Females)'
+        )
+      )
+    ggsave(paste0('figure/gapFigs/',l,ss,'GapAgeAdjusted.png'))
+```
+
+```{r, results='markdown'}
+l <- 'cc'
+ss <- 'RaceM'
+   kable(makeGapTab(gaps[[paste0(l,ss)]]),
+      caption=paste(
+        'Age-adjusted hearing-deaf gaps in',
+        switch(l,
+          hs='High School',
+          cc="Associate's Degree",
+          bach="Bachelor's Degree"
+        ),
+        'Attainment over time',
+        switch(ss,
+          Tot='',
+          ByAgeCat='stratified by Age',
+          Sex='stratified by Sex',
+          Race='stratified by Race/Ethnicity',
+          RaceM='stratified by Race/Ethnicity (Males)',
+          RaceF='stratified by Race/Ethnicity (Females)'
+          )
+      )
+    )
+```
+
+```{r}
+l <- 'bach'
+ss <- 'RaceM'
+   gdat <- gapDatAdj(paste0(l,ss),overTimeAge)
+    plotGap(gdat,errbar=nrow(gdat$subsets)/2<4)+
+      ggtitle(
+        paste(
+          switch(l,
+            hs='High School',
+            cc="Associate's Degree",
+            bach="Bachelor's Degree"
+          ),
+          'Attainment Gaps Over Time (Age-Adjusted)'
+      ),
+      subtitle=if(ss=='Tot') NULL else
+        switch(ss,
+          ByAgeCat='By Age',
+          Sex='By Sex',
+          Race='By Race/Ethnicity',
+          RaceM='By Race/Ethnicity (Males)',
+          RaceF='By Race/Ethnicity (Females)'
+        )
+      )
+    ggsave(paste0('figure/gapFigs/',l,ss,'GapAgeAdjusted.png'))
+```
+
+```{r, results='markdown'}
+l <- 'bach'
+ss <- 'RaceM'
+   kable(makeGapTab(gaps[[paste0(l,ss)]]),
+      caption=paste(
+        'Age-adjusted hearing-deaf gaps in',
+        switch(l,
+          hs='High School',
+          cc="Associate's Degree",
+          bach="Bachelor's Degree"
+        ),
+        'Attainment over time',
+        switch(ss,
+          Tot='',
+          ByAgeCat='stratified by Age',
+          Sex='stratified by Sex',
+          Race='stratified by Race/Ethnicity',
+          RaceM='stratified by Race/Ethnicity (Males)',
+          RaceF='stratified by Race/Ethnicity (Females)'
+          )
+      )
+    )
+```
+
+```{r}
+l <- 'hs'
+ss <- 'RaceF'
+   gdat <- gapDatAdj(paste0(l,ss),overTimeAge)
+    plotGap(gdat,errbar=nrow(gdat$subsets)/2<4)+
+      ggtitle(
+        paste(
+          switch(l,
+            hs='High School',
+            cc="Associate's Degree",
+            bach="Bachelor's Degree"
+          ),
+          'Attainment Gaps Over Time (Age-Adjusted)'
+      ),
+      subtitle=if(ss=='Tot') NULL else
+        switch(ss,
+          ByAgeCat='By Age',
+          Sex='By Sex',
+          Race='By Race/Ethnicity',
+          RaceM='By Race/Ethnicity (Males)',
+          RaceF='By Race/Ethnicity (Females)'
+        )
+      )
+    ggsave(paste0('figure/gapFigs/',l,ss,'GapAgeAdjusted.png'))
+```
+
+```{r, results='markdown'}
+l <- 'hs'
+ss <- 'RaceF'
+   kable(makeGapTab(gaps[[paste0(l,ss)]]),
+      caption=paste(
+        'Age-adjusted hearing-deaf gaps in',
+        switch(l,
+          hs='High School',
+          cc="Associate's Degree",
+          bach="Bachelor's Degree"
+        ),
+        'Attainment over time',
+        switch(ss,
+          Tot='',
+          ByAgeCat='stratified by Age',
+          Sex='stratified by Sex',
+          Race='stratified by Race/Ethnicity',
+          RaceM='stratified by Race/Ethnicity (Males)',
+          RaceF='stratified by Race/Ethnicity (Females)'
+          )
+      )
+    )
+```
+
+```{r}
+l <- 'cc'
+ss <- 'RaceF'
+   gdat <- gapDatAdj(paste0(l,ss),overTimeAge)
+    plotGap(gdat,errbar=nrow(gdat$subsets)/2<4)+
+      ggtitle(
+        paste(
+          switch(l,
+            hs='High School',
+            cc="Associate's Degree",
+            bach="Bachelor's Degree"
+          ),
+          'Attainment Gaps Over Time (Age-Adjusted)'
+      ),
+      subtitle=if(ss=='Tot') NULL else
+        switch(ss,
+          ByAgeCat='By Age',
+          Sex='By Sex',
+          Race='By Race/Ethnicity',
+          RaceM='By Race/Ethnicity (Males)',
+          RaceF='By Race/Ethnicity (Females)'
+        )
+      )
+    ggsave(paste0('figure/gapFigs/',l,ss,'GapAgeAdjusted.png'))
+```
+
+```{r, results='markdown'}
+l <- 'cc'
+ss <- 'RaceF'
+   kable(makeGapTab(gaps[[paste0(l,ss)]]),
+      caption=paste(
+        'Age-adjusted hearing-deaf gaps in',
+        switch(l,
+          hs='High School',
+          cc="Associate's Degree",
+          bach="Bachelor's Degree"
+        ),
+        'Attainment over time',
+        switch(ss,
+          Tot='',
+          ByAgeCat='stratified by Age',
+          Sex='stratified by Sex',
+          Race='stratified by Race/Ethnicity',
+          RaceM='stratified by Race/Ethnicity (Males)',
+          RaceF='stratified by Race/Ethnicity (Females)'
+          )
+      )
+    )
+```
+
+```{r}
+l <- 'bach'
+ss <- 'RaceF'
+   gdat <- gapDatAdj(paste0(l,ss),overTimeAge)
+    plotGap(gdat,errbar=nrow(gdat$subsets)/2<4)+
+      ggtitle(
+        paste(
+          switch(l,
+            hs='High School',
+            cc="Associate's Degree",
+            bach="Bachelor's Degree"
+          ),
+          'Attainment Gaps Over Time (Age-Adjusted)'
+      ),
+      subtitle=if(ss=='Tot') NULL else
+        switch(ss,
+          ByAgeCat='By Age',
+          Sex='By Sex',
+          Race='By Race/Ethnicity',
+          RaceM='By Race/Ethnicity (Males)',
+          RaceF='By Race/Ethnicity (Females)'
+        )
+      )
+    ggsave(paste0('figure/gapFigs/',l,ss,'GapAgeAdjusted.png'))
+```
+
+```{r, results='markdown'}
+l <- 'bach'
+ss <- 'RaceF'
+   kable(makeGapTab(gaps[[paste0(l,ss)]]),
+      caption=paste(
+        'Age-adjusted hearing-deaf gaps in',
+        switch(l,
+          hs='High School',
+          cc="Associate's Degree",
+          bach="Bachelor's Degree"
+        ),
+        'Attainment over time',
+        switch(ss,
+          Tot='',
+          ByAgeCat='stratified by Age',
+          Sex='stratified by Sex',
+          Race='stratified by Race/Ethnicity',
+          RaceM='stratified by Race/Ethnicity (Males)',
+          RaceF='stratified by Race/Ethnicity (Females)'
+          )
+      )
+    )
+```
