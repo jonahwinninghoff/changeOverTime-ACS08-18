@@ -5,12 +5,14 @@ output: word_document
 ---
 
 ```{r textPrelim}
+library(knitr)
+library(tidyverse)
 opts_chunk$set(
 echo=FALSE,results='hide',warning = FALSE,message = FALSE,error=FALSE,cache=FALSE
 )
 ```
 
-```{r textPrelim2, cache=TRUE}
+```{r textPrelim2, cache=FALSE}
 library(knitr)
 knit('overTime.Rmd')
 knit('gapsOverTime.Rmd')
@@ -169,7 +171,7 @@ Trends were similar for deaf Latnix
 ## Trends in Bachelor's Degree Attainment Gaps
 
 The trend in the deaf-hearing gap in Bachelor's degree attainment was estimated as
-`r round(gaps$bachTot$ests['trend'],2)` PPY; this estimate was statistically insignificant
+`r round(gaps$bachTot$ests['trend',1],2)` PPY; this estimate was statistically insignificant
 (p=`r round(gaps$bachTot$pvals,2)`).
 However, the BA gap for males did appear to narrow, at a rate of
 `r round(gaps$bachSex$ests['trend','Male'],2)` PPY (`r pfun(gaps$bachSex$stars['Male'])`).

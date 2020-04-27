@@ -7,9 +7,11 @@ output: word_document
 \newline \newline \newline
 ```{r prelim,include=FALSE,cache=FALSE}
 library(knitr)
-library(ggplot2)
 library(rmarkdown)
 library(english)
+library(scales)
+library(estimatr)
+library(tidyverse)
 
 pfun <- function(strs)
   switch(strs,
@@ -238,10 +240,11 @@ associated null hypotheses were not rejected at the 0.05 level.
 # High School
 
 \newline \newline \newline
+\newpage
 ```{r HStotTable,results='markdown'}
 kable(tabFinish(analysis[['hsTot']]))
 ```
-
+\newpage
 Table: High School completion from 2008-2016.
 
 \newline \newline \newline
@@ -301,6 +304,8 @@ figFun('hsSex',overTime,chg=TRUE,erbr=FALSE)+ggtitle('High School Diploma or Equ
 ```{r HSByAgeCatDeaf,results='markdown'}
 kable(tabFinish(analysis[['hsByAgeCat']],TRUE))
 ```
+
+
 
 Table: Percentage of deaf Americans by age category attaining a
 High School diploma or equivalent.

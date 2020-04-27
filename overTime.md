@@ -1,6 +1,6 @@
 ---
 title: "Trends in Educational Attainment"
-date: 'November 21, 2019'
+date: 'December 09, 2019'
 output: word_document
 ---
 
@@ -124,9 +124,8 @@ associated null hypotheses were not rejected at the 0.05 level.
 
 # High School
 
-\newline \newline \newline
-
-|                 |Deaf             |Hearing        |
+******
+|Year             |Deaf             |Hearing        |
 |:----------------|:----------------|:--------------|
 |2008             |80.1 $\pm$ 0.5   |87.7 $\pm$ 0.1 |
 |2009             |80.2 $\pm$ 0.5   |87.9 $\pm$ 0.1 |
@@ -145,7 +144,7 @@ associated null hypotheses were not rejected at the 0.05 level.
 |Sample Size/year |38,892           |1,551,126      |
 
 Table: High School completion from 2008-2016.
-
+******
 \newline \newline \newline
 ![High School completion over time. Error bars are approximate 95% confidence intervals.](figure/HStotFig-1.png)
 <br><br><br><br>
@@ -155,7 +154,7 @@ Table: High School completion from 2008-2016.
 ### By Gender
 \newline \newline \newline
 
-|                 |Female           |Male             |
+|Year             |Female           |Male             |
 |:----------------|:----------------|:----------------|
 |2008             |78.9 $\pm$ 0.9   |80.7 $\pm$ 0.5   |
 |2009             |79.1 $\pm$ 0.9   |80.9 $\pm$ 0.6   |
@@ -180,7 +179,7 @@ High School diploma or equivalent.
 
 \newline \newline \newline
 
-|                 |Female         |Male           |
+|Year             |Female         |Male           |
 |:----------------|:--------------|:--------------|
 |2008             |88.9 $\pm$ 0.1 |86.5 $\pm$ 0.1 |
 |2009             |89 $\pm$ 0.1   |86.7 $\pm$ 0.1 |
@@ -219,7 +218,7 @@ High School diploma or equivalent.
 
 \newline \newline \newline
 
-|                 |25-34            |35-44            |45-54            |55-64            |
+|Year             |25-34            |35-44            |45-54            |55-64            |
 |:----------------|:----------------|:----------------|:----------------|:----------------|
 |2008             |80.2 $\pm$ 1.8   |80 $\pm$ 1.1     |79.6 $\pm$ 1     |80.4 $\pm$ 0.7   |
 |2009             |82.2 $\pm$ 1.5   |79.5 $\pm$ 1.5   |79.4 $\pm$ 0.9   |80.6 $\pm$ 0.7   |
@@ -244,7 +243,7 @@ High School diploma or equivalent.
 
 \newline \newline \newline
 
-|                 |25-34          |35-44          |45-54          |55-64          |
+|Year             |25-34          |35-44          |45-54          |55-64          |
 |:----------------|:--------------|:--------------|:--------------|:--------------|
 |2008             |86.9 $\pm$ 0.2 |87.7 $\pm$ 0.1 |88.4 $\pm$ 0.1 |87.8 $\pm$ 0.1 |
 |2009             |87.5 $\pm$ 0.2 |87.6 $\pm$ 0.2 |88.3 $\pm$ 0.1 |88 $\pm$ 0.2   |
@@ -281,7 +280,7 @@ High School diploma or equivalent.
 ### By Race/Ethnicity
 \newline \newline \newline
 
-|                 |African American |American Indian |Asian/PacIsl   |Hispanic         |Other          |White            |
+|Year             |African American |American Indian |Asian/PacIsl   |Hispanic         |Other          |White            |
 |:----------------|:----------------|:---------------|:--------------|:----------------|:--------------|:----------------|
 |2008             |72.3 $\pm$ 1.5   |80.4 $\pm$ 3.4  |75.2 $\pm$ 3.7 |57.1 $\pm$ 2     |82.6 $\pm$ 3   |84.4 $\pm$ 0.6   |
 |2009             |71.8 $\pm$ 2.1   |77.6 $\pm$ 4    |72.9 $\pm$ 4.3 |59.1 $\pm$ 2.3   |79.9 $\pm$ 4   |84.4 $\pm$ 0.5   |
@@ -306,7 +305,7 @@ High School diploma or equivalent.
 
 \newline \newline \newline
 
-|                 |African American |American Indian |Asian/PacIsl   |Hispanic       |Other          |White          |
+|Year             |African American |American Indian |Asian/PacIsl   |Hispanic       |Other          |White          |
 |:----------------|:----------------|:---------------|:--------------|:--------------|:--------------|:--------------|
 |2008             |86 $\pm$ 0.3     |83.4 $\pm$ 1.2  |88.3 $\pm$ 0.4 |63.3 $\pm$ 0.3 |89.4 $\pm$ 0.6 |93.1 $\pm$ 0.1 |
 |2009             |86.3 $\pm$ 0.2   |84.5 $\pm$ 0.9  |88.6 $\pm$ 0.3 |63.4 $\pm$ 0.3 |90.4 $\pm$ 0.5 |93.3 $\pm$ 0.1 |
@@ -370,7 +369,7 @@ High School diploma or equivalent.
 #### Deaf Female
 \newline \newline \newline
 
-|                 |African American |American Indian |Asian/PacIsl   |Hispanic         |Other          |White            |
+|Year             |African American |American Indian |Asian/PacIsl   |Hispanic         |Other          |White            |
 |:----------------|:----------------|:---------------|:--------------|:----------------|:--------------|:----------------|
 |2008             |71.5 $\pm$ 2.7   |77.4 $\pm$ 5.8  |72.1 $\pm$ 5.4 |55.7 $\pm$ 2.7   |79.4 $\pm$ 5.2 |84.5 $\pm$ 0.9   |
 |2009             |70.2 $\pm$ 3.1   |69.8 $\pm$ 7.6  |64.6 $\pm$ 6.3 |59.2 $\pm$ 3.4   |77.8 $\pm$ 6.6 |84.7 $\pm$ 0.9   |
@@ -394,7 +393,7 @@ High School diploma or equivalent.
 #### Deaf Male
 \newline \newline \newline
 
-|                 |African American |American Indian |Asian/PacIsl   |Hispanic         |Other          |White            |
+|Year             |African American |American Indian |Asian/PacIsl   |Hispanic         |Other          |White            |
 |:----------------|:----------------|:---------------|:--------------|:----------------|:--------------|:----------------|
 |2008             |73 $\pm$ 2.3     |82.5 $\pm$ 3.6  |78 $\pm$ 4.1   |58 $\pm$ 2.6     |84.8 $\pm$ 3.8 |84.3 $\pm$ 0.7   |
 |2009             |73.4 $\pm$ 2.6   |82.4 $\pm$ 4.7  |79.5 $\pm$ 4.4 |59.1 $\pm$ 2.6   |81.5 $\pm$ 4.4 |84.3 $\pm$ 0.6   |
@@ -419,7 +418,7 @@ High School diploma or equivalent.
 #### Hearing Female
 \newline \newline \newline
 
-|                 |African American |American Indian |Asian/PacIsl   |Hispanic       |Other          |White          |
+|Year             |African American |American Indian |Asian/PacIsl   |Hispanic       |Other          |White          |
 |:----------------|:----------------|:---------------|:--------------|:--------------|:--------------|:--------------|
 |2008             |87.1 $\pm$ 0.3   |85.4 $\pm$ 1.2  |87.1 $\pm$ 0.4 |65.8 $\pm$ 0.3 |90.1 $\pm$ 0.7 |94 $\pm$ 0.1   |
 |2009             |87.3 $\pm$ 0.3   |85.9 $\pm$ 1.2  |87.7 $\pm$ 0.3 |65.8 $\pm$ 0.4 |91 $\pm$ 0.6   |94.1 $\pm$ 0.1 |
@@ -443,7 +442,7 @@ High School diploma or equivalent.
 #### Hearing Male
 \newline \newline \newline
 
-|                 |African American |American Indian |Asian/PacIsl   |Hispanic       |Other          |White          |
+|Year             |African American |American Indian |Asian/PacIsl   |Hispanic       |Other          |White          |
 |:----------------|:----------------|:---------------|:--------------|:--------------|:--------------|:--------------|
 |2008             |84.6 $\pm$ 0.4   |81 $\pm$ 1.7    |89.7 $\pm$ 0.4 |60.9 $\pm$ 0.4 |88.6 $\pm$ 0.8 |92.3 $\pm$ 0.1 |
 |2009             |85.1 $\pm$ 0.4   |83 $\pm$ 1.3    |89.7 $\pm$ 0.4 |61.2 $\pm$ 0.4 |89.8 $\pm$ 0.8 |92.5 $\pm$ 0.1 |
@@ -470,7 +469,7 @@ High School diploma or equivalent.
 
 \newline \newline \newline
 
-|                 |Deaf             |Hearing        |
+|Year             |Deaf             |Hearing        |
 |:----------------|:----------------|:--------------|
 |2008             |23.5 $\pm$ 0.5   |38.7 $\pm$ 0.1 |
 |2009             |23.8 $\pm$ 0.5   |38.9 $\pm$ 0.2 |
@@ -500,7 +499,7 @@ Table: Associates completion from 2008-2016.
 
 \newline \newline \newline
 
-|                 |25-34            |35-44            |45-54            |55-64            |
+|Year             |25-34            |35-44            |45-54            |55-64            |
 |:----------------|:----------------|:----------------|:----------------|:----------------|
 |2008             |20 $\pm$ 1.7     |22.9 $\pm$ 1.4   |22.6 $\pm$ 0.8   |25.2 $\pm$ 0.7   |
 |2009             |23.2 $\pm$ 1.9   |22.5 $\pm$ 1.4   |22.4 $\pm$ 0.9   |25.3 $\pm$ 0.7   |
@@ -525,7 +524,7 @@ Associates diploma or equivalent.
 
 \newline \newline \newline
 
-|                 |25-34          |35-44          |45-54          |55-64          |
+|Year             |25-34          |35-44          |45-54          |55-64          |
 |:----------------|:--------------|:--------------|:--------------|:--------------|
 |2008             |38.6 $\pm$ 0.3 |40.2 $\pm$ 0.2 |37.6 $\pm$ 0.2 |38.2 $\pm$ 0.2 |
 |2009             |39.8 $\pm$ 0.3 |40.2 $\pm$ 0.2 |37.3 $\pm$ 0.2 |38.2 $\pm$ 0.2 |
@@ -562,7 +561,7 @@ Associates diploma or equivalent.
 ### By Gender
 \newline \newline \newline
 
-|                 |Female           |Male             |
+|Year             |Female           |Male             |
 |:----------------|:----------------|:----------------|
 |2008             |24.2 $\pm$ 0.8   |23.1 $\pm$ 0.6   |
 |2009             |24.9 $\pm$ 0.8   |23.2 $\pm$ 0.7   |
@@ -587,7 +586,7 @@ Associates diploma or equivalent.
 
 \newline \newline \newline
 
-|                 |Female         |Male           |
+|Year             |Female         |Male           |
 |:----------------|:--------------|:--------------|
 |2008             |40 $\pm$ 0.1   |37.3 $\pm$ 0.2 |
 |2009             |40.5 $\pm$ 0.2 |37.2 $\pm$ 0.2 |
@@ -627,7 +626,7 @@ Associates diploma or equivalent.
 
 \newline \newline \newline
 
-|                 |African American |American Indian |Asian/PacIsl   |Hispanic         |Other          |White            |
+|Year             |African American |American Indian |Asian/PacIsl   |Hispanic         |Other          |White            |
 |:----------------|:----------------|:---------------|:--------------|:----------------|:--------------|:----------------|
 |2008             |15.6 $\pm$ 1.7   |20.2 $\pm$ 4.3  |36.7 $\pm$ 4.4 |14.5 $\pm$ 1.4   |27.7 $\pm$ 4.1 |25.4 $\pm$ 0.6   |
 |2009             |15.4 $\pm$ 1.7   |21.2 $\pm$ 4.3  |36.7 $\pm$ 3.7 |15.2 $\pm$ 1.8   |24.4 $\pm$ 3.9 |25.7 $\pm$ 0.6   |
@@ -652,7 +651,7 @@ Associates diploma or equivalent.
 
 \newline \newline \newline
 
-|                 |African American |American Indian |Asian/PacIsl   |Hispanic       |Other          |White          |
+|Year             |African American |American Indian |Asian/PacIsl   |Hispanic       |Other          |White          |
 |:----------------|:----------------|:---------------|:--------------|:--------------|:--------------|:--------------|
 |2008             |27.6 $\pm$ 0.3   |23.1 $\pm$ 1.1  |59.7 $\pm$ 0.5 |19.3 $\pm$ 0.2 |38.1 $\pm$ 0.8 |43.2 $\pm$ 0.1 |
 |2009             |27.7 $\pm$ 0.3   |23.3 $\pm$ 1    |59.5 $\pm$ 0.5 |19 $\pm$ 0.3   |39.2 $\pm$ 0.8 |43.7 $\pm$ 0.1 |
@@ -690,7 +689,7 @@ Associates diploma or equivalent.
 #### Deaf Female
 \newline \newline \newline
 
-|                 |African American |American Indian |Asian/PacIsl   |Hispanic         |Other          |White            |
+|Year             |African American |American Indian |Asian/PacIsl   |Hispanic         |Other          |White            |
 |:----------------|:----------------|:---------------|:--------------|:----------------|:--------------|:----------------|
 |2008             |15.5 $\pm$ 2     |17.3 $\pm$ 5.9  |37.2 $\pm$ 5.8 |14.7 $\pm$ 1.9   |26.6 $\pm$ 5.5 |27 $\pm$ 1       |
 |2009             |16 $\pm$ 2.1     |20.2 $\pm$ 7.5  |33.2 $\pm$ 5.8 |15.2 $\pm$ 2.5   |23.4 $\pm$ 4.8 |27.9 $\pm$ 1     |
@@ -714,7 +713,7 @@ Associates diploma or equivalent.
 #### Deaf Male
 \newline \newline \newline
 
-|                 |African American |American Indian |Asian/PacIsl   |Hispanic         |Other          |White            |
+|Year             |African American |American Indian |Asian/PacIsl   |Hispanic         |Other          |White            |
 |:----------------|:----------------|:---------------|:--------------|:----------------|:--------------|:----------------|
 |2008             |15.7 $\pm$ 2.6   |22.4 $\pm$ 5.7  |36.3 $\pm$ 5.2 |14.4 $\pm$ 2     |28.5 $\pm$ 5.8 |24.5 $\pm$ 0.7   |
 |2009             |14.8 $\pm$ 2.3   |21.8 $\pm$ 5.5  |39.5 $\pm$ 5   |15.2 $\pm$ 1.9   |25.2 $\pm$ 5.4 |24.5 $\pm$ 0.7   |
@@ -739,7 +738,7 @@ Associates diploma or equivalent.
 #### Hearing Female
 \newline \newline \newline
 
-|                 |African American |American Indian |Asian/PacIsl   |Hispanic       |Other          |White          |
+|Year             |African American |American Indian |Asian/PacIsl   |Hispanic       |Other          |White          |
 |:----------------|:----------------|:---------------|:--------------|:--------------|:--------------|:--------------|
 |2008             |29.9 $\pm$ 0.4   |26.6 $\pm$ 1.4  |58.2 $\pm$ 0.6 |21.2 $\pm$ 0.3 |40.1 $\pm$ 0.9 |44.4 $\pm$ 0.2 |
 |2009             |30.3 $\pm$ 0.4   |25.1 $\pm$ 1.3  |58.3 $\pm$ 0.6 |21.1 $\pm$ 0.3 |41 $\pm$ 1.2   |45.1 $\pm$ 0.2 |
@@ -763,7 +762,7 @@ Associates diploma or equivalent.
 #### Hearing Male
 \newline \newline \newline
 
-|                 |African American |American Indian |Asian/PacIsl   |Hispanic       |Other          |White          |
+|Year             |African American |American Indian |Asian/PacIsl   |Hispanic       |Other          |White          |
 |:----------------|:----------------|:---------------|:--------------|:--------------|:--------------|:--------------|
 |2008             |24.9 $\pm$ 0.4   |19 $\pm$ 1.4    |61.4 $\pm$ 0.6 |17.5 $\pm$ 0.3 |35.9 $\pm$ 1.1 |42.1 $\pm$ 0.2 |
 |2009             |24.5 $\pm$ 0.4   |21.1 $\pm$ 1.2  |60.7 $\pm$ 0.6 |17 $\pm$ 0.3   |37.3 $\pm$ 1   |42.2 $\pm$ 0.2 |
@@ -818,7 +817,7 @@ Associates diploma or equivalent.
 # Bachelors
 \newline \newline \newline
 
-|                 |Deaf             |Hearing        |
+|Year             |Deaf             |Hearing        |
 |:----------------|:----------------|:--------------|
 |2008             |15.9 $\pm$ 0.4   |30.2 $\pm$ 0.1 |
 |2009             |15.9 $\pm$ 0.4   |30.5 $\pm$ 0.1 |
@@ -851,7 +850,7 @@ Table: Bachelor's degree attainment from 2008-2016.
 
 \newline \newline \newline
 
-|                 |Female           |Male             |
+|Year             |Female           |Male             |
 |:----------------|:----------------|:----------------|
 |2008             |16.1 $\pm$ 0.7   |15.7 $\pm$ 0.5   |
 |2009             |16.4 $\pm$ 0.6   |15.7 $\pm$ 0.5   |
@@ -876,7 +875,7 @@ Bachelor's degree.
 
 \newline \newline \newline
 
-|                 |Female         |Male           |
+|Year             |Female         |Male           |
 |:----------------|:--------------|:--------------|
 |2008             |30.5 $\pm$ 0.1 |29.9 $\pm$ 0.1 |
 |2009             |31.1 $\pm$ 0.2 |29.8 $\pm$ 0.2 |
@@ -917,7 +916,7 @@ Bachelor's degree.
 
 \newline \newline \newline
 
-|                 |25-34            |35-44            |45-54            |55-64          |
+|Year             |25-34            |35-44            |45-54            |55-64          |
 |:----------------|:----------------|:----------------|:----------------|:--------------|
 |2008             |13.2 $\pm$ 1.5   |14.8 $\pm$ 1.1   |14.6 $\pm$ 0.7   |17.8 $\pm$ 0.6 |
 |2009             |14.2 $\pm$ 1.7   |14.9 $\pm$ 1.2   |14.3 $\pm$ 0.7   |17.8 $\pm$ 0.6 |
@@ -942,7 +941,7 @@ Bachelor's degree.
 
 \newline \newline \newline
 
-|                 |25-34          |35-44          |45-54          |55-64          |
+|Year             |25-34          |35-44          |45-54          |55-64          |
 |:----------------|:--------------|:--------------|:--------------|:--------------|
 |2008             |30.1 $\pm$ 0.2 |31.4 $\pm$ 0.2 |28.8 $\pm$ 0.2 |30.7 $\pm$ 0.2 |
 |2009             |31.6 $\pm$ 0.2 |31.5 $\pm$ 0.2 |28.4 $\pm$ 0.2 |30.6 $\pm$ 0.2 |
@@ -983,7 +982,7 @@ Bachelor's degree.
 ### By Race/Ethnicity
 \newline \newline \newline
 
-|                 |African American |American Indian |Asian/PacIsl   |Hispanic         |Other          |White            |
+|Year             |African American |American Indian |Asian/PacIsl   |Hispanic         |Other          |White            |
 |:----------------|:----------------|:---------------|:--------------|:----------------|:--------------|:----------------|
 |2008             |9.6 $\pm$ 1.5    |10.5 $\pm$ 3.2  |29.7 $\pm$ 4.7 |8.6 $\pm$ 1.2    |17 $\pm$ 3.3   |17.4 $\pm$ 0.5   |
 |2009             |9.3 $\pm$ 1.2    |14 $\pm$ 3.1    |28.4 $\pm$ 3.3 |9.5 $\pm$ 1.3    |15.4 $\pm$ 3.3 |17.3 $\pm$ 0.5   |
@@ -1008,7 +1007,7 @@ Bachelor's degree.
 
 \newline \newline \newline
 
-|                 |African American |American Indian |Asian/PacIsl   |Hispanic       |Other          |White          |
+|Year             |African American |American Indian |Asian/PacIsl   |Hispanic       |Other          |White          |
 |:----------------|:----------------|:---------------|:--------------|:--------------|:--------------|:--------------|
 |2008             |19.3 $\pm$ 0.2   |14.4 $\pm$ 0.9  |52.5 $\pm$ 0.4 |13.6 $\pm$ 0.2 |28.7 $\pm$ 0.7 |34.1 $\pm$ 0.1 |
 |2009             |19.5 $\pm$ 0.3   |14.7 $\pm$ 0.8  |52.4 $\pm$ 0.5 |13.4 $\pm$ 0.2 |29.8 $\pm$ 0.8 |34.5 $\pm$ 0.1 |
@@ -1053,7 +1052,7 @@ Bachelor's degree.
 #### Deaf Female
 \newline \newline \newline
 
-|                 |African American |American Indian |Asian/PacIsl   |Hispanic         |Other          |White            |
+|Year             |African American |American Indian |Asian/PacIsl   |Hispanic         |Other          |White            |
 |:----------------|:----------------|:---------------|:--------------|:----------------|:--------------|:----------------|
 |2008             |9.6 $\pm$ 1.8    |8.3 $\pm$ 3.7   |29.7 $\pm$ 6.4 |8.8 $\pm$ 1.8    |15.9 $\pm$ 4.5 |18.2 $\pm$ 0.9   |
 |2009             |10.3 $\pm$ 1.9   |14.1 $\pm$ 6.1  |26.3 $\pm$ 5.3 |8.9 $\pm$ 1.8    |12.6 $\pm$ 3.8 |18.5 $\pm$ 0.9   |
@@ -1078,7 +1077,7 @@ Bachelors degree or equivalent.
 #### Deaf Male
 \newline \newline \newline
 
-|                 |African American |American Indian |Asian/PacIsl   |Hispanic         |Other          |White            |
+|Year             |African American |American Indian |Asian/PacIsl   |Hispanic         |Other          |White            |
 |:----------------|:----------------|:---------------|:--------------|:----------------|:--------------|:----------------|
 |2008             |9.7 $\pm$ 2.1    |12.1 $\pm$ 4.5  |29.7 $\pm$ 5.4 |8.5 $\pm$ 1.6    |17.7 $\pm$ 4.7 |17 $\pm$ 0.7     |
 |2009             |8.5 $\pm$ 1.8    |13.9 $\pm$ 4.3  |30 $\pm$ 4.8   |9.9 $\pm$ 1.4    |17.6 $\pm$ 5.1 |16.7 $\pm$ 0.6   |
@@ -1102,8 +1101,9 @@ Bachelors degree or equivalent.
 
 #### Hearing Female
 \newline \newline \newline
+\newpage
 
-|                 |African American |American Indian |Asian/PacIsl   |Hispanic       |Other          |White          |
+|Year             |African American |American Indian |Asian/PacIsl   |Hispanic       |Other          |White          |
 |:----------------|:----------------|:---------------|:--------------|:--------------|:--------------|:--------------|
 |2008             |20.6 $\pm$ 0.3   |16.5 $\pm$ 1.2  |50.6 $\pm$ 0.5 |14.8 $\pm$ 0.3 |29.3 $\pm$ 1   |34.2 $\pm$ 0.2 |
 |2009             |21.2 $\pm$ 0.3   |15.8 $\pm$ 1.1  |50.6 $\pm$ 0.6 |14.8 $\pm$ 0.3 |30.4 $\pm$ 1.1 |34.9 $\pm$ 0.2 |
@@ -1123,11 +1123,11 @@ Bachelors degree or equivalent.
 
 Table: Percentage of female hearing Americans by race/ethnicity attaining a
 Bachelors degree or equivalent.
-
+\newpage
 #### Hearing Male
 \newline \newline \newline
 
-|                 |African American |American Indian |Asian/PacIsl   |Hispanic       |Other          |White          |
+|Year             |African American |American Indian |Asian/PacIsl   |Hispanic       |Other          |White          |
 |:----------------|:----------------|:---------------|:--------------|:--------------|:--------------|:--------------|
 |2008             |17.8 $\pm$ 0.4   |12 $\pm$ 1.2    |54.7 $\pm$ 0.6 |12.6 $\pm$ 0.3 |28.1 $\pm$ 1   |34 $\pm$ 0.2   |
 |2009             |17.4 $\pm$ 0.3   |13.4 $\pm$ 1.2  |54.3 $\pm$ 0.6 |12.1 $\pm$ 0.3 |29.1 $\pm$ 0.9 |34.1 $\pm$ 0.2 |

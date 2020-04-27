@@ -1,6 +1,3 @@
-library(scales)
-library(tidyr)
-library(estimatr)
 
 
 combineDat <- function(nnn,ot,deaf=NULL){
@@ -165,6 +162,9 @@ tabFinish <- function(anal1,deaf=NULL,moe=TRUE){ #ests,ses,moe,strs){
   ##                            diffFun(ests['Trend (Adj)',],ses['Trend (Adj)',],moe,diffStars[2]),''))
   ##   }
 
+    tab <- tab%>%
+      tibble::rownames_to_column('Year')
+
     tab
 }
 
@@ -311,9 +311,11 @@ trends <- function(nnn,ot,weightDat=NULL,intercept=FALSE){
         for(j in 1:ncol(subsets)){
           if(is.factor(subsets[,j])) subsets[,j] <- as.character(subsets[,j])
           keep <- keep&(tdat[,subCols[j]]==subsets[i,j])
-        }
-        trends[[paste(subCols,subsets[i,],collapse=' ',sep='=')]] <-
-          summary(lm_robust(form,data=tdat[keep,],weights=ww))$coef[rows,]
+      }
+        trnd <- summary(lm_robust(form,data=tdat[keep,],weights=ww))$coef[rows,]
+        if(is.nan(trnd['Std. Error']))
+            trnd <- summary(lm_robust(form,data=tdat[keep,],weights=ww,se_type='HC1'))$coef[rows,]
+        trends[[paste(subCols,subsets[i,],collapse=' ',sep='=')]] <- trnd
       }
       trends
     })
@@ -566,7 +568,12 @@ plotGap <- function(gdat,errbar=TRUE,se=TRUE){
 gapAdjOne <- function(tab,...){
   names(tab)[grep('edLev',names(tab))] <- 'y'
   mod <- lm_robust(y~DEAR+as.factor(AGEP),data=tab,subset=!is.na(y)&!is.na(se))
-  as.data.frame(summary(mod)$coef)['DEAR',1:2]
+  out <- as.data.frame(summary(mod)$coef)['DEAR',1:2]
+  if(any(is.nan(out[['Std. Error']]))){
+    mod <- update(mod,se_type='HC1')
+    out <- as.data.frame(summary(mod)$coef)['DEAR',1:2]
+  }
+  out
 }
 
 gapAdj <- function(dat){
@@ -581,7 +588,7 @@ gapAdj <- function(dat){
 
   dat%>%
     group_by_at(vars(!! sym(subCols)))%>%
-    group_map(gapAdjOne)%>%
+    group_modify(gapAdjOne)%>%
     mutate(year=dat$year[1])
 }
 
@@ -607,7 +614,7 @@ gapTrend <- function(nnn,overTimeAge,weightDat,...){
 
   tdat%>%
     group_by_at(vars(!! sym(ccc$subCols[2])))%>%
-    group_map(gapTrendOne)
+    group_modify(gapTrendOne)
 }
 
 gapAdjYr <- function(nnn,overTimeAge,weightDat=NULL){
