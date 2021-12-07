@@ -6,16 +6,16 @@ varNames <- tolower(c('ST','SERIALNO','AGEP','DDRS','DEAR','DEYE','DOUT','DPHY',
 makeDes <- function(YR){
 
     print(YR)
-
+    directory<-paste(getwd(),'Assets/byYear/ss',sep='/')
     yr <- if(is.integer(YR)){ if(YR<10) paste0('0',YR) else(paste0(YR)) } else YR
-    firstTry <- read_csv(paste0('../../data/byYear/ss',yr,'pusa.csv'), n_max=5)
+    firstTry <- read_csv(paste0(directory,yr,'pusa.csv'), n_max=5)
     colTypes <- paste(ifelse(tolower(names(firstTry))%in%varNames,'i','-'),collapse='')
 
-    datA <- read_csv(paste0('../../data/byYear/ss',yr,'pusa.csv'),col_types=colTypes)
+    datA <- read_csv(paste0(directory,yr,'pusa.csv'),col_types=colTypes)
     names(datA) <- tolower(names(datA))
     #stopifnot(all.equal(sort(names(datA)),sort(varNames)))
 
-    datB <- read_csv(paste0('../../data/byYear/ss',yr,'pusb.csv'),col_types=colTypes)
+    datB <- read_csv(paste0(directory,yr,'pusb.csv'),col_types=colTypes)
     names(datB) <- tolower(names(datB))
 
     if(!setequal(names(datA),names(datB)))

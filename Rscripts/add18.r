@@ -1,5 +1,8 @@
-source('makeData.r')
-source('estByYear.r')
+# Add different directory due to folder structure change
+directory<- c(paste(getwd(),'Rscripts/makeData.r',sep='/'),
+              paste(getwd(),'Rscripts/estByYear.r',sep='/'))
+
+for(i in c(1,2)){source(directory[i])} # Read two scripts
 
 load('output/estsOverTimeTot.RData')
 

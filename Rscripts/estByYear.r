@@ -1,6 +1,7 @@
 library(kimisc)
 library(tidyverse)
-source('generalCode/estimationFunctions.r')
+directory <- paste(getwd(),'Rscripts/estimationFunctions.r',sep='/')
+source(directory)
 
 #if(!exists('ya')) ya <- FALSE
 
